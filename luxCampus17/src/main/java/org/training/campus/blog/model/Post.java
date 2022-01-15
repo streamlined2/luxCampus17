@@ -11,7 +11,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
 
-import lombok.AccessLevel;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -21,24 +22,17 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
-@EqualsAndHashCode(of = { "id" })
-@ToString
-@Entity
-@Table(name = "post", schema = "public")
+@AllArgsConstructor @NoArgsConstructor @Builder
+@Getter @Setter
+@ToString @EqualsAndHashCode(of = { "id" })
+@Entity @Table(name = "post", schema = "public")
 public class Post implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Setter(AccessLevel.PROTECTED)
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	@NaturalId @Column(name = "title")
+	@NaturalId @Column @JsonProperty
 	private @NonNull String title;
-	@Column(name = "content")
+	@Column @JsonProperty
 	private @NonNull String content;
 
 }
