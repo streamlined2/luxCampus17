@@ -2,8 +2,14 @@ package org.training.campus.blog.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.NaturalId;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,13 +28,17 @@ import lombok.ToString;
 @Builder
 @EqualsAndHashCode(of = { "id" })
 @ToString
+@Entity
+@Table(name = "post", schema = "public")
 public class Post implements Serializable {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Setter(AccessLevel.PROTECTED)
 	private long id;
+	@NaturalId @Column(name = "title")
 	private @NonNull String title;
+	@Column(name = "content")
 	private @NonNull String content;
 
 }
