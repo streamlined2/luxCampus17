@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +40,11 @@ class LuxCampus17ApplicationTests {
 
 	private MockMvc mvc;
 	private AutoCloseable closeable;
+
+	@Captor
+	private ArgumentCaptor<Post> postCaptor;
+	@Captor
+	private ArgumentCaptor<Long> idCaptor;
 
 	@BeforeEach
 	private void init() {
@@ -108,15 +114,10 @@ class LuxCampus17ApplicationTests {
 		mvc.perform(get("/api/v1/posts/{id}", id)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 	}
 
-	@Captor
-	private ArgumentCaptor<Post> postCaptor;
-
 	@Test
 	@DisplayName("test for post addition")
 	void testAddPost() throws Exception {
 		final Long id = 1L;
-		
-		Assertions.assertNotNull(postCaptor);
 
 		doAnswer(invocation -> {
 			Post p = (Post) invocation.getArgument(0);
@@ -137,6 +138,35 @@ class LuxCampus17ApplicationTests {
 		Assertions.assertEquals("This is most amazing story I've ever read in my life!",
 				postCaptor.getValue().getContent());
 		Assertions.assertEquals(id, postCaptor.getValue().getId());
+	}
+
+	@Test
+	@DisplayName("test for post modification")
+	void testModifyPost() throws Exception {
+		final Long id = 1L;
+		final Post samplePost = Post.builder().id(0).title("Any title").content("Any content").build();
+
+		doAnswer(invocation -> {
+			Long postId = (Long) invocation.getArgument(0);
+			Post p = (Post) invocation.getArgument(1);
+			samplePost.setTitle(p.getTitle());
+			samplePost.setContent(p.getContent());
+			samplePost.setId(postId);
+			return p;
+		}).when(postService).save(any(Post.class));
+
+		mvc.perform(put("/api/v1/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+				   {
+				      "title": "Top-ranking story",
+				      "content": "This is most amazing story I've ever read in my life!"
+				  }
+				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+
+		verify(postService).save(idCaptor.capture(), postCaptor.capture());
+		Assertions.assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
+		Assertions.assertEquals("This is most amazing story I've ever read in my life!",
+				postCaptor.getValue().getContent());
+		Assertions.assertEquals(id, idCaptor.getValue());
 	}
 
 }
