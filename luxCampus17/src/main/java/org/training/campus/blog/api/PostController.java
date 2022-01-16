@@ -21,29 +21,28 @@ public class PostController {
 
 	@Autowired
 	private PostService postService;
-	
+
 	@GetMapping
-	public List<Post> getAll(
-			@RequestParam(name = "title", required = false) String title, 
+	public List<Post> getAll(@RequestParam(name = "title", required = false) String title,
 			@RequestParam(name = "sort", required = false) String sort) {
 		return postService.findAll();
 	}
-	
+
 	@GetMapping("/{id}")
-	public Post getById(@PathVariable("id") Long id){
+	public Post getById(@PathVariable("id") Long id) {
 		return postService.findById(id).orElse(null);
 	}
-	
+
 	@PostMapping
-	public void add(@RequestBody Post post) {
-		postService.save(post);
+	public Long add(@RequestBody Post post) {
+		return postService.save(post).getId();
 	}
-	
+
 	@PutMapping("/{id}")
 	public void modify(@PathVariable("id") Long id, @RequestBody Post post) {
 		postService.save(id, post);
 	}
-	
+
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable("id") Long id) {
 		postService.deleteById(id);
