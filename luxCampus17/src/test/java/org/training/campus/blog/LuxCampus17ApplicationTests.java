@@ -4,17 +4,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -134,26 +133,22 @@ class LuxCampus17ApplicationTests {
 				content().string(String.valueOf(id)));
 
 		verify(postService).save(postCaptor.capture());
-		Assertions.assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
-		Assertions.assertEquals("This is most amazing story I've ever read in my life!",
-				postCaptor.getValue().getContent());
-		Assertions.assertEquals(id, postCaptor.getValue().getId());
+		assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
+		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().getContent());
+		assertEquals(id, postCaptor.getValue().getId());
 	}
 
 	@Test
 	@DisplayName("test for post modification")
 	void testModifyPost() throws Exception {
 		final Long id = 1L;
-		final Post samplePost = Post.builder().id(0).title("Any title").content("Any content").build();
 
 		doAnswer(invocation -> {
 			Long postId = (Long) invocation.getArgument(0);
 			Post p = (Post) invocation.getArgument(1);
-			samplePost.setTitle(p.getTitle());
-			samplePost.setContent(p.getContent());
-			samplePost.setId(postId);
+			p.setId(postId);
 			return p;
-		}).when(postService).save(any(Post.class));
+		}).when(postService).save(any(Long.class), any(Post.class));
 
 		mvc.perform(put("/api/v1/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
 				   {
@@ -163,10 +158,22 @@ class LuxCampus17ApplicationTests {
 				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
 		verify(postService).save(idCaptor.capture(), postCaptor.capture());
-		Assertions.assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
-		Assertions.assertEquals("This is most amazing story I've ever read in my life!",
-				postCaptor.getValue().getContent());
-		Assertions.assertEquals(id, idCaptor.getValue());
+		assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
+		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().getContent());
+		assertEquals(id, idCaptor.getValue());
+		assertEquals(id, postCaptor.getValue().getId());
+	}
+
+	@Test
+	@DisplayName("test for post deletion")
+	void testDeletePost() throws Exception {
+		final Long id = 1L;
+
+		mvc.perform(delete("/api/v1/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("")
+				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+
+		verify(postService).deleteById(idCaptor.capture());
+		assertEquals(id, idCaptor.getValue());
 	}
 
 }
