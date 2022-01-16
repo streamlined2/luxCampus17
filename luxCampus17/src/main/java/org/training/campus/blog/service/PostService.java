@@ -22,6 +22,11 @@ public class PostService {
 		return dao.save(post);
 	}
 
+	public <T extends Post> T save(Long id, Post post) {
+		post.setId(id);
+		return dao.save(post);
+	}
+
 	public Optional<Post> findById(Long id) {
 		return dao.findById(id);
 	}

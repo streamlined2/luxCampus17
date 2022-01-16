@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.training.campus.blog.model.Post;
 import org.training.campus.blog.service.PostService;
@@ -22,7 +23,9 @@ public class PostController {
 	private PostService postService;
 	
 	@GetMapping
-	public List<Post> getAll(){
+	public List<Post> getAll(
+			@RequestParam(name = "title", required = false) String title, 
+			@RequestParam(name = "sort", required = false) String sort) {
 		return postService.findAll();
 	}
 	
@@ -38,8 +41,7 @@ public class PostController {
 	
 	@PutMapping("/{id}")
 	public void modify(@PathVariable("id") Long id, @RequestBody Post post) {
-		post.setId(id);
-		postService.save(post);
+		postService.save(id, post);
 	}
 	
 	@DeleteMapping("/{id}")
