@@ -1,6 +1,7 @@
 package org.training.campus.blog.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,10 @@ public class PostService {
 	private PostDao dao;
 
 	public List<Post> findAll() {
+		return dao.findAll();
+	}
+
+	public List<Post> findAll(Map<String, String> filterMap, List<String> sortList) {
 		return dao.findAll();
 	}
 
