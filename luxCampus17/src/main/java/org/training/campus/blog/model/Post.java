@@ -18,7 +18,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -30,9 +29,9 @@ public class Post implements Serializable {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	@NaturalId @Column @JsonProperty
-	private @NonNull String title;
-	@Column @JsonProperty
-	private @NonNull String content;
+	@NaturalId @Column(nullable = false) @JsonProperty
+	private String title;
+	@Column(nullable = false) @JsonProperty
+	private String content;
 
 }

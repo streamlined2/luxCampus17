@@ -1,9 +1,7 @@
 package org.training.campus.blog.api;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,15 +26,7 @@ public class PostController {
 	@GetMapping
 	public List<Post> getAll(@RequestParam(name = "title", required = false) String title,
 			@RequestParam(name = "sort", required = false) String sort) {
-		Map<String, String> filterMap = new HashMap<>();
-		if (title != null) {
-			filterMap.put("title", title);
-		}
-		List<String> sortList = new ArrayList<>();
-		if (sort != null) {
-			sortList.add(sort);
-		}
-		return postService.findAll();//filterMap, sortList
+		return postService.findAll(Optional.ofNullable(title), Optional.ofNullable(sort));
 	}
 
 	@GetMapping("/{id}")

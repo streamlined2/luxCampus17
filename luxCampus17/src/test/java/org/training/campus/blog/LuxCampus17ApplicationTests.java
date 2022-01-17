@@ -89,21 +89,20 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for all posts with given title")
 	void testListOfPostsWithGivenTitle() throws Exception {
-		final List<Post> sampleData = List.of(
-				Post.builder().id(1L).title("Most talented person I've ever met")
-						.content("I've met her today while walking in the street.").build());
+		final List<Post> sampleData = List.of(Post.builder().id(1L).title("Most talented person I've ever met")
+				.content("I've met her today while walking in the street.").build());
 
-		when(postService.findAll(anyMap(),anyList())).thenReturn(sampleData);
+		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
 		final String sampleTitle = "Most talented person I've ever met";
 		mvc.perform(get("/api/v1/posts?title={sampleTitle}", sampleTitle)).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
-						    {
-						        "id": 1,
-						        "title": "Most talented person I've ever met",
-						        "content": "I've met her today while walking in the street."
-						    }
-							"""));
+						   {
+						       "id": 1,
+						       "title": "Most talented person I've ever met",
+						       "content": "I've met her today while walking in the street."
+						   }
+						"""));
 	}
 
 	@Test
@@ -111,11 +110,11 @@ class LuxCampus17ApplicationTests {
 	void testListOfPostsSortedByTitle() throws Exception {
 		final List<Post> sampleData = List.of(
 				Post.builder().id(1L).title("Most valuable dish I've ever served")
-				.content("Cold salmon topped with fried onions and soaked with white wine").build(),
+						.content("Cold salmon topped with fried onions and soaked with white wine").build(),
 				Post.builder().id(2L).title("Most talented person I've ever met")
 						.content("I've met her today while walking in the street.").build());
 
-		when(postService.findAll(anyMap(),anyList())).thenReturn(sampleData);
+		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
 		mvc.perform(get("/api/v1/posts?sort=title")).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
