@@ -49,4 +49,19 @@ public class PostController {
 		postService.deleteById(id);
 	}
 
+	@GetMapping("/star")
+	public List<Post> getAllTops() {
+		return postService.findAllTops();
+	}
+
+	@PutMapping("/{id}/star")
+	public void markAsTop(@PathVariable("id") Long id) {
+		postService.markAsTop(id);
+	}
+
+	@DeleteMapping("/{id}/star")
+	public void removeTopMark(@PathVariable("id") Long id) {
+		postService.removeTopMark(id);
+	}
+
 }

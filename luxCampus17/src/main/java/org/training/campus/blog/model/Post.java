@@ -33,5 +33,7 @@ public class Post implements Serializable {
 	private String title;
 	@Column(nullable = false) @JsonProperty
 	private String content;
+	@Column @JsonProperty
+	private boolean star;
 
 }

@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -222,6 +223,50 @@ class LuxCampus17ApplicationTests {
 				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
 		verify(postService).deleteById(idCaptor.capture());
+		assertEquals(id, idCaptor.getValue());
+	}
+
+	@Test
+	@DisplayName("test for top posts listing")
+	void testGetAllTops() throws Exception {
+		final List<Post> sampleData = List.of(Post.builder().id(1L).title("Most talented person I've ever met")
+				.content("I've met her today while walking in the street.").star(true).build());
+
+		when(postService.findAllTops()).thenReturn(sampleData);
+
+		mvc.perform(get("/api/v1/posts/star")).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						[
+						    {
+						        "id": 1,
+						        "title": "Most talented person I've ever met",
+						        "content": "I've met her today while walking in the street."
+						    }
+						]
+							"""));
+	}
+
+	@Test
+	@DisplayName("test for post marking as top")
+	void testMarkAsTop() throws Exception {
+		final Long id = 1L;
+
+		mvc.perform(put("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
+				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+
+		verify(postService).markAsTop(idCaptor.capture());
+		assertEquals(id, idCaptor.getValue());
+	}
+
+	@Test
+	@DisplayName("test for removing top marking")
+	void testRemoveTopMark() throws Exception {
+		final Long id = 1L;
+
+		mvc.perform(delete("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
+				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+
+		verify(postService).removeTopMark(idCaptor.capture());
 		assertEquals(id, idCaptor.getValue());
 	}
 

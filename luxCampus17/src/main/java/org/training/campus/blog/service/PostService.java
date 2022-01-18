@@ -48,4 +48,18 @@ public class PostService {
 		dao.deleteById(id);
 	}
 
+	public List<Post> findAllTops() {
+		// TODO Auto-generated method stub		
+		return null;
+	}
+
+	public void markAsTop(Long id) {
+		// TODO Auto-generated method stub		
+	}
+
+	public void removeTopMark(Long id) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
