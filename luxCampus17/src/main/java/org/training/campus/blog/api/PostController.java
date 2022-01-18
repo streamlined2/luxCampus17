@@ -50,18 +50,18 @@ public class PostController {
 	}
 
 	@GetMapping("/star")
-	public List<Post> getAllTops() {
-		return postService.findAllTops();
+	public List<Post> getAllStarred() {
+		return postService.findAllStarred();
 	}
 
 	@PutMapping("/{id}/star")
-	public void markAsTop(@PathVariable("id") Long id) {
-		postService.markAsTop(id);
+	public void markAsStarred(@PathVariable("id") Long id) {
+		postService.markAsStarred(id);
 	}
 
 	@DeleteMapping("/{id}/star")
-	public void removeTopMark(@PathVariable("id") Long id) {
-		postService.removeTopMark(id);
+	public void removeStarredMark(@PathVariable("id") Long id) {
+		postService.removeStarredMark(id);
 	}
 
 }

@@ -48,18 +48,20 @@ public class PostService {
 		dao.deleteById(id);
 	}
 
-	public List<Post> findAllTops() {
-		// TODO Auto-generated method stub		
-		return null;
+	public List<Post> findAllStarred() {
+		Post starredPost = Post.builder().star(true).build();
+		var matcher = ExampleMatcher.matchingAll().withMatcher("star", GenericPropertyMatchers.exact())
+				.withIgnorePaths("id");
+		return dao.findAll(Example.of(starredPost, matcher));
 	}
 
-	public void markAsTop(Long id) {
-		// TODO Auto-generated method stub		
-	}
-
-	public void removeTopMark(Long id) {
+	public void markAsStarred(Long id) {
 		// TODO Auto-generated method stub
-		
+	}
+
+	public void removeStarredMark(Long id) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

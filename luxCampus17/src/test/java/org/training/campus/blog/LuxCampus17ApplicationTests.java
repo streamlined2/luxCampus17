@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -74,12 +73,14 @@ class LuxCampus17ApplicationTests {
 						    {
 						        "id": 1,
 						        "title": "Most talented person I've ever met",
-						        "content": "I've met her today while walking in the street."
+						        "content": "I've met her today while walking in the street.",
+						        "star": false
 						    },
 						    {
 						        "id": 2,
 						        "title": "Most valuable dish I've ever served",
-						        "content": "Cold salmon topped with fried onions and soaked with white wine"
+						        "content": "Cold salmon topped with fried onions and soaked with white wine",
+						        "star": false
 						    }
 						]
 							"""));
@@ -100,7 +101,8 @@ class LuxCampus17ApplicationTests {
 						   {
 						       "id": 1,
 						       "title": "Most talented person I've ever met",
-						       "content": "I've met her today while walking in the street."
+						       "content": "I've met her today while walking in the street.",
+						        "star": false
 						   }
 						]
 						"""));
@@ -123,12 +125,14 @@ class LuxCampus17ApplicationTests {
 						    {
 						        "id": 2,
 						        "title": "Most talented person I've ever met",
-						        "content": "I've met her today while walking in the street."
+						        "content": "I've met her today while walking in the street.",
+						        "star": false
 						    },
 						    {
 						        "id": 1,
 						        "title": "Most valuable dish I've ever served",
-						        "content": "Cold salmon topped with fried onions and soaked with white wine"
+						        "content": "Cold salmon topped with fried onions and soaked with white wine",
+						        "star": false
 						    }
 						]
 							"""));
@@ -148,7 +152,8 @@ class LuxCampus17ApplicationTests {
 						   {
 						       "id": 1,
 						       "title": "Most talented person I've ever met",
-						       "content": "I've met her today while walking in the street."
+						       "content": "I've met her today while walking in the street.",
+						       "star": false
 						   }
 						"""));
 
@@ -177,7 +182,8 @@ class LuxCampus17ApplicationTests {
 		mvc.perform(post("/api/v1/posts").contentType(MediaType.APPLICATION_JSON).content("""
 				   {
 				      "title": "Top-ranking story",
-				      "content": "This is most amazing story I've ever read in my life!"
+				      "content": "This is most amazing story I've ever read in my life!",
+					  "star": false
 				  }
 				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(),
 				content().string(String.valueOf(id)));
@@ -203,7 +209,8 @@ class LuxCampus17ApplicationTests {
 		mvc.perform(put("/api/v1/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
 				   {
 				      "title": "Top-ranking story",
-				      "content": "This is most amazing story I've ever read in my life!"
+				      "content": "This is most amazing story I've ever read in my life!",
+					  "star": false
 				  }
 				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
@@ -232,7 +239,7 @@ class LuxCampus17ApplicationTests {
 		final List<Post> sampleData = List.of(Post.builder().id(1L).title("Most talented person I've ever met")
 				.content("I've met her today while walking in the street.").star(true).build());
 
-		when(postService.findAllTops()).thenReturn(sampleData);
+		when(postService.findAllStarred()).thenReturn(sampleData);
 
 		mvc.perform(get("/api/v1/posts/star")).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
@@ -240,7 +247,8 @@ class LuxCampus17ApplicationTests {
 						    {
 						        "id": 1,
 						        "title": "Most talented person I've ever met",
-						        "content": "I've met her today while walking in the street."
+						        "content": "I've met her today while walking in the street.",
+						        "star": true
 						    }
 						]
 							"""));
@@ -254,7 +262,7 @@ class LuxCampus17ApplicationTests {
 		mvc.perform(put("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
 				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
-		verify(postService).markAsTop(idCaptor.capture());
+		verify(postService).markAsStarred(idCaptor.capture());
 		assertEquals(id, idCaptor.getValue());
 	}
 
@@ -266,7 +274,7 @@ class LuxCampus17ApplicationTests {
 		mvc.perform(delete("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
 				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
-		verify(postService).removeTopMark(idCaptor.capture());
+		verify(postService).removeStarredMark(idCaptor.capture());
 		assertEquals(id, idCaptor.getValue());
 	}
 
