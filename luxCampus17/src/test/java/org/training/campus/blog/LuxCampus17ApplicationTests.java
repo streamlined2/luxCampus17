@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -258,9 +259,10 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for post marking as top")
 	void testMarkAsTop() throws Exception {
 		final Long id = 1L;
+		when(postService.markAsStarred(eq(id))).thenReturn(true);
 
 		mvc.perform(put("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
-				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
 		verify(postService).markAsStarred(idCaptor.capture());
 		assertEquals(id, idCaptor.getValue());

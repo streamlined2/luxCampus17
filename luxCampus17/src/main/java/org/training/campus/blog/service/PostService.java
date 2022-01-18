@@ -27,7 +27,7 @@ public class PostService {
 		PostBuilder builder = Post.builder();
 		title.ifPresent(builder::title);
 		var matcher = ExampleMatcher.matchingAll().withMatcher("title", GenericPropertyMatchers.contains().ignoreCase())
-				.withIgnorePaths("id");
+				.withIgnorePaths("id","star");
 		return dao.findAll(Example.of(builder.build(), matcher), sortProperty.map(Sort::by).orElse(Sort.unsorted()));
 	}
 
@@ -55,8 +55,15 @@ public class PostService {
 		return dao.findAll(Example.of(starredPost, matcher));
 	}
 
-	public void markAsStarred(Long id) {
-		// TODO Auto-generated method stub
+	public boolean markAsStarred(Long id) {
+		Optional<Post> postData = dao.findById(id);
+		if(postData.isPresent()) {
+			Post post = postData.get();
+			post.setStar(true);
+			dao.save(post);
+			return true;
+		}
+		return false;
 	}
 
 	public void removeStarredMark(Long id) {

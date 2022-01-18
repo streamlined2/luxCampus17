@@ -55,8 +55,8 @@ public class PostController {
 	}
 
 	@PutMapping("/{id}/star")
-	public void markAsStarred(@PathVariable("id") Long id) {
-		postService.markAsStarred(id);
+	public boolean markAsStarred(@PathVariable("id") Long id) {
+		return postService.markAsStarred(id);
 	}
 
 	@DeleteMapping("/{id}/star")
