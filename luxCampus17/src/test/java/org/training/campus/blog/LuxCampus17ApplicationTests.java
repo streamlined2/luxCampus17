@@ -235,7 +235,7 @@ class LuxCampus17ApplicationTests {
 	}
 
 	@Test
-	@DisplayName("test for top posts listing")
+	@DisplayName("test for starred posts listing")
 	void testGetAllTops() throws Exception {
 		final List<Post> sampleData = List.of(Post.builder().id(1L).title("Most talented person I've ever met")
 				.content("I've met her today while walking in the street.").star(true).build());
@@ -256,7 +256,7 @@ class LuxCampus17ApplicationTests {
 	}
 
 	@Test
-	@DisplayName("test for post marking as top")
+	@DisplayName("test for post marking as starred")
 	void testMarkAsTop() throws Exception {
 		final Long id = 1L;
 		when(postService.markAsStarred(eq(id))).thenReturn(true);
@@ -269,12 +269,13 @@ class LuxCampus17ApplicationTests {
 	}
 
 	@Test
-	@DisplayName("test for removing top marking")
+	@DisplayName("test for removing starred marking")
 	void testRemoveTopMark() throws Exception {
 		final Long id = 1L;
+		when(postService.removeStarredMark(eq(id))).thenReturn(true);
 
 		mvc.perform(delete("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
-				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
 		verify(postService).removeStarredMark(idCaptor.capture());
 		assertEquals(id, idCaptor.getValue());

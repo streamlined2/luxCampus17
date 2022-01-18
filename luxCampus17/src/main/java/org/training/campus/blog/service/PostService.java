@@ -66,9 +66,15 @@ public class PostService {
 		return false;
 	}
 
-	public void removeStarredMark(Long id) {
-		// TODO Auto-generated method stub
-
+	public boolean removeStarredMark(Long id) {
+		Optional<Post> postData = dao.findById(id);
+		if(postData.isPresent()) {
+			Post post = postData.get();
+			post.setStar(false);
+			dao.save(post);
+			return true;
+		}
+		return false;
 	}
 
 }

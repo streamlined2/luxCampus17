@@ -60,8 +60,8 @@ public class PostController {
 	}
 
 	@DeleteMapping("/{id}/star")
-	public void removeStarredMark(@PathVariable("id") Long id) {
-		postService.removeStarredMark(id);
+	public boolean removeStarredMark(@PathVariable("id") Long id) {
+		return postService.removeStarredMark(id);
 	}
 
 }
