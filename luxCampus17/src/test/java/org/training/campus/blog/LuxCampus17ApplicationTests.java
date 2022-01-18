@@ -4,8 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -67,7 +65,7 @@ class LuxCampus17ApplicationTests {
 				Post.builder().id(2L).title("Most valuable dish I've ever served")
 						.content("Cold salmon topped with fried onions and soaked with white wine").build());
 
-		when(postService.findAll()).thenReturn(sampleData);
+		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
 		mvc.perform(get("/api/v1/posts")).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
@@ -97,11 +95,13 @@ class LuxCampus17ApplicationTests {
 		final String sampleTitle = "Most talented person I've ever met";
 		mvc.perform(get("/api/v1/posts?title={sampleTitle}", sampleTitle)).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						[
 						   {
 						       "id": 1,
 						       "title": "Most talented person I've ever met",
 						       "content": "I've met her today while walking in the street."
 						   }
+						]
 						"""));
 	}
 

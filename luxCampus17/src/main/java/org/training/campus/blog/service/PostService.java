@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.training.campus.blog.dao.PostDao;
 import org.training.campus.blog.model.Post;
@@ -19,7 +20,7 @@ public class PostService {
 	private PostDao dao;
 
 	public List<Post> findAll() {
-		return dao.findAll();
+		return findAll(Optional.empty(), Optional.empty());
 	}
 
 	public List<Post> findAll(Optional<String> title, Optional<String> sortProperty) {
@@ -27,8 +28,7 @@ public class PostService {
 		title.ifPresent(builder::title);
 		var matcher = ExampleMatcher.matchingAll().withMatcher("title", GenericPropertyMatchers.contains().ignoreCase())
 				.withIgnorePaths("id");
-		Example<Post> example = Example.of(builder.build(), matcher);
-		return dao.findAll(example);
+		return dao.findAll(Example.of(builder.build(), matcher), sortProperty.map(Sort::by).orElse(Sort.unsorted()));
 	}
 
 	public <T extends Post> T save(Post post) {
