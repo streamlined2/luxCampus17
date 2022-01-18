@@ -56,21 +56,18 @@ public class PostService {
 	}
 
 	public boolean markAsStarred(Long id) {
-		Optional<Post> postData = dao.findById(id);
-		if(postData.isPresent()) {
-			Post post = postData.get();
-			post.setStar(true);
-			dao.save(post);
-			return true;
-		}
-		return false;
+		return placeMark(id, true);
 	}
 
 	public boolean removeStarredMark(Long id) {
+		return placeMark(id, false);
+	}
+
+	private boolean placeMark(Long id, boolean value) {
 		Optional<Post> postData = dao.findById(id);
 		if(postData.isPresent()) {
 			Post post = postData.get();
-			post.setStar(false);
+			post.setStar(value);
 			dao.save(post);
 			return true;
 		}
