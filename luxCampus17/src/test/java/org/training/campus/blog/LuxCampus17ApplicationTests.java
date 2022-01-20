@@ -28,9 +28,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.training.campus.blog.api.CommentController;
 import org.training.campus.blog.api.PostController;
+import org.training.campus.blog.dto.CommentMapper;
 import org.training.campus.blog.dto.PostMapper;
 import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
@@ -45,6 +48,8 @@ class LuxCampus17ApplicationTests {
 	private PostMapper postMapper;
 	@Mock
 	private CommentService commentService;
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	private CommentMapper commentMapper;
 
 	@InjectMocks
 	private PostController postController;
@@ -301,9 +306,9 @@ class LuxCampus17ApplicationTests {
 	void testListOfCommentsForGivenPost() throws Exception {
 		final Post samplePost = Post.builder().id(1L).title("Most talented person I've ever met")
 				.content("I've met her today while walking in the street.").build();
-		final List<Comment> comments = List.of(new Comment(1L, "Comment#1", LocalDate.now(), samplePost),
-				new Comment(2L, "Comment#2", LocalDate.now(), samplePost),
-				new Comment(3L, "Comment#3", LocalDate.now(), samplePost));
+		final List<Comment> comments = List.of(new Comment(1L, "Comment#1", LocalDate.of(2020, 10, 01), samplePost),
+				new Comment(2L, "Comment#2", LocalDate.of(2021, 01, 02), samplePost),
+				new Comment(3L, "Comment#3", LocalDate.of(2021, 03, 05), samplePost));
 
 		when(commentService.getCommentsForPost(samplePost.getId())).thenReturn(comments);
 
@@ -313,22 +318,39 @@ class LuxCampus17ApplicationTests {
 						   {
 						       "id": 1,
 						       "text": "Comment#1",
-						       "creationDate": "2020-10-01",
-						        "post": 1
+						       "creationDate": "2020-10-01"
 						   },
 						   {
 						       "id": 2,
 						       "text": "Comment#2",
-						       "creationDate": "2021-01-02",
-						        "post": 1
+						       "creationDate": "2021-01-02"
 						   },
 						   {
 						       "id": 3,
 						       "text": "Comment#3",
-						       "creationDate": "2021-03-05",
-						        "post": 1
+						       "creationDate": "2021-03-05"
 						   }
 						]
+						"""));
+	}
+
+	@Test
+	@DisplayName("test comment listing with given post and comment ids")
+	void testCommentForGivenPostCommentIds() throws Exception {
+		final Post samplePost = Post.builder().id(1L).title("Most talented person I've ever met")
+				.content("I've met her today while walking in the street.").build();
+		final Optional<Comment> comment = Optional
+				.of(new Comment(1L, "Comment#1", LocalDate.of(2020, 10, 01), samplePost));
+
+		when(commentService.getCommentForPost(samplePost.getId(), comment.get().getId())).thenReturn(comment);
+
+		mvc.perform(get("/api/v1/posts/{postId}/comments/{commentId}", samplePost.getId(), comment.get().getId()))
+				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						   {
+						       "id": 1,
+						       "text": "Comment#1",
+						       "creationDate": "2020-10-01"
+						   }
 						"""));
 	}
 

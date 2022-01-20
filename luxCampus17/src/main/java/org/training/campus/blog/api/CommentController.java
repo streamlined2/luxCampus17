@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.training.campus.blog.model.Comment;
+import org.training.campus.blog.dto.CommentDTO;
+import org.training.campus.blog.dto.CommentMapper;
 import org.training.campus.blog.service.CommentService;
 
 @RestController
@@ -19,33 +20,35 @@ import org.training.campus.blog.service.CommentService;
 public class CommentController {
 
 	private final CommentService commentService;
+	private final CommentMapper commentMapper;
 
 	@Autowired
-	private CommentController(CommentService commentService) {
+	private CommentController(CommentService commentService, CommentMapper commentMapper) {
 		this.commentService = commentService;
+		this.commentMapper = commentMapper;
 	}
 
 	@GetMapping("/{postId}/comments")
-	public List<Comment> getCommentsForPost(@PathVariable("postId") Long postId) {
-		return commentService.getCommentsForPost(postId);
+	public List<CommentDTO> getCommentsForPost(@PathVariable("postId") Long postId) {
+		return commentService.getCommentsForPost(postId).stream().map(commentMapper::toDto).toList();
 	}
 
 	@GetMapping("/{postId}/comments/{commentId}")
-	public Optional<Comment> getComment(@PathVariable("postId") Long postId,
+	public Optional<CommentDTO> getCommentForPost(@PathVariable("postId") Long postId,
 			@PathVariable("commentId") Long commentId) {
 		// TODO
 		return Optional.empty();
 	}
 
 	@PostMapping("/{postId}/comments")
-	public Long createComment(@PathVariable("postid") Long postId, @RequestBody Comment comment) {
+	public Long createComment(@PathVariable("postid") Long postId, @RequestBody CommentDTO comment) {
 		// TODO
 		return null;
 	}
 
 	@PutMapping("/{postId}/comments/{commentId}")
 	public boolean modifyComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
-			@RequestBody Comment comment) {
+			@RequestBody CommentDTO comment) {
 		// TODO
 		return false;
 	}
