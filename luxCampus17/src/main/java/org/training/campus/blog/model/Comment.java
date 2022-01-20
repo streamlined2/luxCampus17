@@ -12,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -30,11 +33,11 @@ public class Comment implements Serializable {
 	
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	@Column(name = "text", nullable = false) @JsonProperty
+	@Column(name = "text", nullable = false)
 	private String text;
-	@Column(name = "creation_date", nullable = false) @JsonProperty
+	@Column(name = "creation_date", nullable = false)
 	private LocalDate creationDate;
-	@ManyToOne(optional = false) @JoinColumn(name = "post_id")
+	@ManyToOne(optional = false) @JoinColumn(nullable = false, name = "post_id")
 	private Post post;
 
 }

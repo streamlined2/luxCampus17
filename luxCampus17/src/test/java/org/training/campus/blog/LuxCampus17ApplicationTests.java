@@ -12,12 +12,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -26,20 +29,30 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.training.campus.blog.api.CommentController;
 import org.training.campus.blog.api.PostController;
+import org.training.campus.blog.dto.PostMapper;
+import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
+import org.training.campus.blog.service.CommentService;
 import org.training.campus.blog.service.PostService;
 
 class LuxCampus17ApplicationTests {
 
 	@Mock
 	private PostService postService;
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	private PostMapper postMapper;
+	@Mock
+	private CommentService commentService;
 
 	@InjectMocks
 	private PostController postController;
+	@InjectMocks
+	private CommentController commentController;
 
 	private MockMvc mvc;
-	private AutoCloseable closeable;
+	private AutoCloseable mocksClosableResource;
 
 	@Captor
 	private ArgumentCaptor<Post> postCaptor;
@@ -48,13 +61,13 @@ class LuxCampus17ApplicationTests {
 
 	@BeforeEach
 	private void init() {
-		closeable = MockitoAnnotations.openMocks(this);
-		mvc = MockMvcBuilders.standaloneSetup(postController).build();
+		mocksClosableResource = MockitoAnnotations.openMocks(this);
+		mvc = MockMvcBuilders.standaloneSetup(postController, commentController).build();
 	}
 
 	@AfterEach
 	private void destroy() throws Exception {
-		closeable.close();
+		mocksClosableResource.close();
 	}
 
 	@Test
@@ -259,12 +272,13 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for post marking as starred")
 	void testMarkAsTop() throws Exception {
 		final Long id = 1L;
-		when(postService.markAsStarred(eq(id))).thenReturn(true);
+		when(postService.placeMark(eq(id), eq(true))).thenReturn(true);
 
 		mvc.perform(put("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
-				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
-		verify(postService).markAsStarred(idCaptor.capture());
+		verify(postService).placeMark(idCaptor.capture(), eq(true));
 		assertEquals(id, idCaptor.getValue());
 	}
 
@@ -272,13 +286,50 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for removing starred marking")
 	void testRemoveTopMark() throws Exception {
 		final Long id = 1L;
-		when(postService.removeStarredMark(eq(id))).thenReturn(true);
+		when(postService.placeMark(eq(id), eq(false))).thenReturn(true);
 
 		mvc.perform(delete("/api/v1/posts/{id}/star", id).contentType(MediaType.APPLICATION_JSON).content("")
-				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
-		verify(postService).removeStarredMark(idCaptor.capture());
+		verify(postService).placeMark(idCaptor.capture(), eq(false));
 		assertEquals(id, idCaptor.getValue());
+	}
+
+	@Test
+	@DisplayName("test all comments listing for given post")
+	void testListOfCommentsForGivenPost() throws Exception {
+		final Post samplePost = Post.builder().id(1L).title("Most talented person I've ever met")
+				.content("I've met her today while walking in the street.").build();
+		final List<Comment> comments = List.of(new Comment(1L, "Comment#1", LocalDate.now(), samplePost),
+				new Comment(2L, "Comment#2", LocalDate.now(), samplePost),
+				new Comment(3L, "Comment#3", LocalDate.now(), samplePost));
+
+		when(commentService.getCommentsForPost(samplePost.getId())).thenReturn(comments);
+
+		mvc.perform(get("/api/v1/posts/{postId}/comments", samplePost.getId())).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						[
+						   {
+						       "id": 1,
+						       "text": "Comment#1",
+						       "creationDate": "2020-10-01",
+						        "post": 1
+						   },
+						   {
+						       "id": 2,
+						       "text": "Comment#2",
+						       "creationDate": "2021-01-02",
+						        "post": 1
+						   },
+						   {
+						       "id": 3,
+						       "text": "Comment#3",
+						       "creationDate": "2021-03-05",
+						        "post": 1
+						   }
+						]
+						"""));
 	}
 
 }

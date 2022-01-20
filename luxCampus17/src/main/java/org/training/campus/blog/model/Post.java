@@ -1,6 +1,7 @@
 package org.training.campus.blog.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,8 +13,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,13 +30,13 @@ public class Post implements Serializable {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	@NaturalId @Column(name = "title", nullable = false) @JsonProperty
+	@NaturalId @Column(name = "title", nullable = false)
 	private String title;
-	@Column(name = "content", nullable = false) @JsonProperty
+	@Column(name = "content", nullable = false)
 	private String content;
-	@Column(name = "star", nullable = false) @JsonProperty
+	@Column(name = "star", nullable = false)
 	private boolean star;
-	@OneToMany(mappedBy = "post_id")
-	private List<Comment> comments;
-
+	@OneToMany(mappedBy = "post")
+	private List<Comment> comments = new ArrayList<>();
+	
 }

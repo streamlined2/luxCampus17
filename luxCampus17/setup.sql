@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.post
 
 CREATE TABLE IF NOT EXISTS public.comment
 (
-    id bigint NOT NULL,
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
     text character varying(10000) COLLATE pg_catalog."default" NOT NULL,
     creation_date date NOT NULL,
     post_id bigint NOT NULL,

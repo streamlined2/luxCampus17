@@ -16,8 +16,12 @@ import org.training.campus.blog.model.Post.PostBuilder;
 @Service
 public class PostService {
 
+	private final PostDao dao;
+
 	@Autowired
-	private PostDao dao;
+	private PostService(PostDao dao) {
+		this.dao = dao;
+	}
 
 	public List<Post> findAll() {
 		return findAll(Optional.empty(), Optional.empty());
@@ -27,7 +31,7 @@ public class PostService {
 		PostBuilder builder = Post.builder();
 		title.ifPresent(builder::title);
 		var matcher = ExampleMatcher.matchingAll().withMatcher("title", GenericPropertyMatchers.contains().ignoreCase())
-				.withIgnorePaths("id","star");
+				.withIgnorePaths("id", "star");
 		return dao.findAll(Example.of(builder.build(), matcher), sortProperty.map(Sort::by).orElse(Sort.unsorted()));
 	}
 
@@ -55,17 +59,9 @@ public class PostService {
 		return dao.findAll(Example.of(starredPost, matcher));
 	}
 
-	public boolean markAsStarred(Long id) {
-		return placeMark(id, true);
-	}
-
-	public boolean removeStarredMark(Long id) {
-		return placeMark(id, false);
-	}
-
-	private boolean placeMark(Long id, boolean value) {
+	public boolean placeMark(Long id, boolean value) {
 		Optional<Post> postData = dao.findById(id);
-		if(postData.isPresent()) {
+		if (postData.isPresent()) {
 			Post post = postData.get();
 			post.setStar(value);
 			dao.save(post);

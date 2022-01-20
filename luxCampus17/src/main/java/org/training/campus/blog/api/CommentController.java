@@ -26,13 +26,12 @@ public class CommentController {
 	}
 
 	@GetMapping("/{postId}/comments")
-	public List<Comment> getAllComments(@PathVariable("postId") Long postId) {
-		// TODO
-		return null;
+	public List<Comment> getCommentsForPost(@PathVariable("postId") Long postId) {
+		return commentService.getCommentsForPost(postId);
 	}
 
 	@GetMapping("/{postId}/comments/{commentId}")
-	public Optional<Comment> getCommentFor(@PathVariable("postId") Long postId,
+	public Optional<Comment> getComment(@PathVariable("postId") Long postId,
 			@PathVariable("commentId") Long commentId) {
 		// TODO
 		return Optional.empty();
