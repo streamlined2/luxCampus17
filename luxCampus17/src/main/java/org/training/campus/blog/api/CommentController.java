@@ -1,8 +1,6 @@
 package org.training.campus.blog.api;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,21 +32,20 @@ public class CommentController {
 	}
 
 	@GetMapping("/{postId}/comments/{commentId}")
-	public Optional<CommentDTO> getCommentForPost(@PathVariable("postId") Long postId,
+	public CommentDTO getCommentForPost(@PathVariable("postId") Long postId,
 			@PathVariable("commentId") Long commentId) {
-		// TODO
-		return Optional.empty();
+		return commentService.getCommentForPost(postId, commentId).map(commentMapper::toDto).orElse(null);
 	}
 
 	@PostMapping("/{postId}/comments")
-	public Long createComment(@PathVariable("postid") Long postId, @RequestBody CommentDTO comment) {
+	public Long add(@PathVariable("postId") Long postId, @RequestBody CommentDTO commentDto) {
 		// TODO
 		return null;
 	}
 
 	@PutMapping("/{postId}/comments/{commentId}")
-	public boolean modifyComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
-			@RequestBody CommentDTO comment) {
+	public boolean modify(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
+			@RequestBody CommentDTO commentDto) {
 		// TODO
 		return false;
 	}

@@ -1,5 +1,6 @@
 package org.training.campus.blog.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +28,17 @@ public class CommentService {
 	}
 
 	public Optional<Comment> getCommentForPost(Long postId, Long commentId) {
-		List<Comment> postComments = getCommentsForPost(postId);
-		return postComments.stream().filter(comment -> comment.getId() == commentId).findAny();
+		return getCommentsForPost(postId).stream().filter(comment -> comment.getId() == commentId).findAny();
+	}
+
+	public Optional<Comment> save(Long postId, Comment comment) {
+		Optional<Post> post = postDao.findById(postId);
+		if (post.isPresent()) {
+			comment.setPost(post.get());
+			comment.setCreationDate(LocalDate.now());
+			return Optional.of(commentDao.save(comment));
+		}
+		return Optional.empty();
 	}
 
 }

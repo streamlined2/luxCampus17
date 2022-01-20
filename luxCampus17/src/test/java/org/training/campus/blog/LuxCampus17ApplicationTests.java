@@ -28,8 +28,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.training.campus.blog.api.CommentController;
 import org.training.campus.blog.api.PostController;
@@ -60,9 +58,11 @@ class LuxCampus17ApplicationTests {
 	private AutoCloseable mocksClosableResource;
 
 	@Captor
+	private ArgumentCaptor<Long> idCaptor;
+	@Captor
 	private ArgumentCaptor<Post> postCaptor;
 	@Captor
-	private ArgumentCaptor<Long> idCaptor;
+	private ArgumentCaptor<Comment> commentCaptor;
 
 	@BeforeEach
 	private void init() {
@@ -352,6 +352,39 @@ class LuxCampus17ApplicationTests {
 						       "creationDate": "2020-10-01"
 						   }
 						"""));
+	}
+
+	@Test
+	@DisplayName("test for comment addition")
+	void testAddComment() throws Exception {
+		final Long postId = 1L;
+		final Post post = Post.builder().id(postId).title("Happy life").content("Doing right things in right time")
+				.build();
+		final Long commentId = 10L;
+		final Comment comment = new Comment(0L, "Never-ending story about happy life...", LocalDate.of(2020, 01, 01),
+				post);
+
+		doAnswer(invocation -> {
+			Comment c = (Comment) invocation.getArgument(0);
+			c.setId(commentId);
+			return c;
+		}).when(commentService).save(eq(postId), any(Comment.class));
+
+		mvc.perform(post("/api/v1/posts/{postId}/comments", postId).contentType(MediaType.APPLICATION_JSON).content("""
+				   {
+				      "id": 1,
+				      "text": "Never-ending story about happy life...",
+					  "creationDate": "2020-01-01"
+				  }
+				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(),
+				content().string(String.valueOf(commentId)));
+
+		verify(commentService).save(postId, commentCaptor.capture());
+		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().getText());
+		assertEquals(LocalDate.of(2020, 01, 01), commentCaptor.getValue().getCreationDate());
+		assertEquals(commentId, commentCaptor.getValue().getId());
+		assertEquals(postId, commentCaptor.getValue().getPost().getId());
+
 	}
 
 }
