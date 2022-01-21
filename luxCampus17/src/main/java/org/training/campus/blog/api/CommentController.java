@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.training.campus.blog.dto.CommentDTO;
 import org.training.campus.blog.dto.CommentMapper;
+import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.service.CommentService;
 
 @RestController
@@ -39,8 +40,7 @@ public class CommentController {
 
 	@PostMapping("/{postId}/comments")
 	public Long add(@PathVariable("postId") Long postId, @RequestBody CommentDTO commentDto) {
-		// TODO
-		return null;
+		return commentService.add(postId, commentMapper.toComment(commentDto)).map(Comment::getId).orElse(null);
 	}
 
 	@PutMapping("/{postId}/comments/{commentId}")

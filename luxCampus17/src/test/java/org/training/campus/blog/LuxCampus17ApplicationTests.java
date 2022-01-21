@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -361,27 +362,27 @@ class LuxCampus17ApplicationTests {
 		final Post post = Post.builder().id(postId).title("Happy life").content("Doing right things in right time")
 				.build();
 		final Long commentId = 10L;
-		final Comment comment = new Comment(0L, "Never-ending story about happy life...", LocalDate.of(2020, 01, 01),
-				post);
+		final LocalDate creationDate = LocalDate.of(2020, 01, 01);
+		final Comment comment = new Comment(0L, "Dummy text", null, null);
 
 		doAnswer(invocation -> {
-			Comment c = (Comment) invocation.getArgument(0);
+			Comment c = (Comment) invocation.getArgument(1);
 			c.setId(commentId);
-			return c;
-		}).when(commentService).save(eq(postId), any(Comment.class));
+			c.setCreationDate(creationDate);
+			c.setPost(post);
+			return Optional.of(c);
+		}).when(commentService).add(anyLong(), eq(comment));
 
 		mvc.perform(post("/api/v1/posts/{postId}/comments", postId).contentType(MediaType.APPLICATION_JSON).content("""
 				   {
-				      "id": 1,
-				      "text": "Never-ending story about happy life...",
-					  "creationDate": "2020-01-01"
+				      "text": "Never-ending story about happy life..."
 				  }
 				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(),
 				content().string(String.valueOf(commentId)));
 
-		verify(commentService).save(postId, commentCaptor.capture());
+		verify(commentService).add(anyLong(), commentCaptor.capture());
 		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().getText());
-		assertEquals(LocalDate.of(2020, 01, 01), commentCaptor.getValue().getCreationDate());
+		assertEquals(creationDate, commentCaptor.getValue().getCreationDate());
 		assertEquals(commentId, commentCaptor.getValue().getId());
 		assertEquals(postId, commentCaptor.getValue().getPost().getId());
 
