@@ -44,10 +44,9 @@ public class CommentController {
 	}
 
 	@PutMapping("/{postId}/comments/{commentId}")
-	public boolean modify(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
+	public void modify(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
 			@RequestBody CommentDTO commentDto) {
-		// TODO
-		return false;
+		commentService.save(commentId, commentMapper.toComment(commentDto));
 	}
 
 }

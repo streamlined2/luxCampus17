@@ -388,4 +388,36 @@ class LuxCampus17ApplicationTests {
 
 	}
 
+	@Test
+	@DisplayName("test for comment modification")
+	void testModifyComment() throws Exception {
+		final Long postId = 1L;
+		final Post post = Post.builder().id(postId).build();
+		final Long commentId = 10L;
+		final LocalDate creationDate = LocalDate.of(2020, 01, 01);
+
+		doAnswer(invocation -> {
+			Comment c = (Comment) invocation.getArgument(1);
+			c.setId(commentId);
+			c.setCreationDate(creationDate);
+			c.setPost(post);
+			return Optional.of(c);
+		}).when(commentService).save(anyLong(), any(Comment.class));
+
+		mvc.perform(put("/api/v1/posts/{postId}/comments/{commentId}", postId, commentId)
+				.contentType(MediaType.APPLICATION_JSON).content("""
+						   {
+						      "text": "Never-ending story about happy life..."
+						  }
+						""").accept(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk(), content().bytes("".getBytes()));
+
+		verify(commentService).save(anyLong(), commentCaptor.capture());
+		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().getText());
+		assertEquals(creationDate, commentCaptor.getValue().getCreationDate());
+		assertEquals(commentId, commentCaptor.getValue().getId());
+		assertEquals(postId, commentCaptor.getValue().getPost().getId());
+
+	}
+
 }

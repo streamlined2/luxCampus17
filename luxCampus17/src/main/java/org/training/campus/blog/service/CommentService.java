@@ -30,17 +30,22 @@ public class CommentService {
 	public Optional<Comment> getCommentForPost(Long postId, Long commentId) {
 		return getCommentsForPost(postId).stream().filter(comment -> comment.getId() == commentId).findAny();
 	}
-	
-	public Optional<Comment> add(Long postId, Comment comment){
-		comment.setCreationDate(LocalDate.now());
-		return save(postId, comment);
-	}
 
-	public Optional<Comment> save(Long postId, Comment comment) {
+	public Optional<Comment> add(Long postId, Comment comment) {
 		Optional<Post> post = postDao.findById(postId);
 		if (post.isPresent()) {
 			comment.setPost(post.get());
+			comment.setCreationDate(LocalDate.now());
 			return Optional.of(commentDao.save(comment));
+		}
+		return Optional.empty();
+	}
+
+	public Optional<Comment> save(Long commentId, Comment comment) {
+		Optional<Comment> savedComment = commentDao.findById(commentId);
+		if (savedComment.isPresent()) {
+			savedComment.get().setText(comment.getText());
+			return Optional.of(commentDao.save(savedComment.get()));
 		}
 		return Optional.empty();
 	}
