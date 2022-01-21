@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.training.campus.blog.dto.PostCommentDTO;
 import org.training.campus.blog.dto.PostDTO;
 import org.training.campus.blog.dto.PostMapper;
 import org.training.campus.blog.service.PostService;
@@ -70,6 +71,11 @@ public class PostController {
 	@DeleteMapping("/{id}/star")
 	public boolean removeStarredMark(@PathVariable("id") Long id) {
 		return postService.placeMark(id, false);
+	}
+	
+	@GetMapping("/{postId}/full")
+	public PostCommentDTO postCommentFullListing(@PathVariable("postId") Long postId) {
+		return null;
 	}
 
 }

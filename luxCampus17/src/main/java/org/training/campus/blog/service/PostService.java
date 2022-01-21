@@ -10,6 +10,9 @@ import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.training.campus.blog.dao.PostDao;
+import org.training.campus.blog.dto.PostCommentDTO;
+import org.training.campus.blog.dto.PostCommentMapper;
+import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
 import org.training.campus.blog.model.Post.PostBuilder;
 
@@ -17,10 +20,14 @@ import org.training.campus.blog.model.Post.PostBuilder;
 public class PostService {
 
 	private final PostDao dao;
+	private final PostCommentMapper postCommentMapper;
+	private final CommentService commentService;
 
 	@Autowired
-	private PostService(PostDao dao) {
+	private PostService(PostDao dao, PostCommentMapper postCommentMapper, CommentService commentService) {
 		this.dao = dao;
+		this.postCommentMapper = postCommentMapper;
+		this.commentService = commentService;
 	}
 
 	public List<Post> findAll() {
@@ -68,6 +75,16 @@ public class PostService {
 			return true;
 		}
 		return false;
+	}
+
+	public Optional<PostCommentDTO> getPostComments(Long postId) {
+		Optional<Post> postData = dao.findById(postId);
+		if (postData.isPresent()) {
+			Post post = postData.get();
+			List<Comment> comments = commentService.getCommentsForPost(post.getId());
+			return Optional.of(postCommentMapper.toDto(post, comments.toArray(new Comment[0])));
+		}
+		return Optional.empty();
 	}
 
 }

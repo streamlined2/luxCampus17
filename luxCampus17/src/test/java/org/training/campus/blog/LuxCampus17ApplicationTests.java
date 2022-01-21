@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.training.campus.blog.api.CommentController;
 import org.training.campus.blog.api.PostController;
 import org.training.campus.blog.dto.CommentMapper;
+import org.training.campus.blog.dto.PostCommentMapper;
 import org.training.campus.blog.dto.PostMapper;
 import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
@@ -49,6 +50,8 @@ class LuxCampus17ApplicationTests {
 	private CommentService commentService;
 	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private CommentMapper commentMapper;
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	private PostCommentMapper postCommentMapper;
 
 	@InjectMocks
 	private PostController postController;
@@ -418,6 +421,59 @@ class LuxCampus17ApplicationTests {
 		assertEquals(commentId, commentCaptor.getValue().getId());
 		assertEquals(postId, commentCaptor.getValue().getPost().getId());
 
+	}
+
+	@Test
+	@DisplayName("test for one post & comments full listing that's found successfully")
+	void testFullListingOfOnePostCommentsSuccess() throws Exception {
+		final Long postId = 1L;
+		final Post samplePost = Post.builder().id(postId).title("Title").content("Content").star(true).build();
+		final var today = LocalDate.of(2020, 01, 01);
+		final Comment[] comments = {
+				Comment.builder().id(1L).text("comment #1").creationDate(today).post(samplePost).build(),
+				Comment.builder().id(2L).text("comment #2").creationDate(today).post(samplePost).build(),
+				Comment.builder().id(3L).text("comment #3").creationDate(today).post(samplePost).build() };
+		var postCommentDto = postCommentMapper.toDto(samplePost, comments);
+
+		when(postService.getPostComments(postId)).thenReturn(Optional.of(postCommentDto));
+
+		mvc.perform(get("/api/v1/posts/{postId}/full", postId)).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						   {
+						       "id": 1,
+						       "title": "Title",
+						       "content": "Content",
+						       "star": true,
+						       "comments": [
+						       		{
+								       "id": 1,
+								       "text": "comment #1",
+								       "creationDate": "2020-01-01"
+						       		},
+						       		{
+								       "id": 2,
+								       "text": "comment #2",
+								       "creationDate": "2020-01-01"
+						       		},
+						       		{
+								       "id": 3,
+								       "text": "comment #3",
+								       "creationDate": "2020-01-01"
+						       		}
+						       ]
+						   }
+						"""));
+
+	}
+
+	@Test
+	@DisplayName("test for one post & comments full listing that's not found")
+	void testFullListingOfOnePostCommentsFail() throws Exception {
+		final Long postId = 1L;
+		when(postService.getPostComments(postId)).thenReturn(Optional.empty());
+
+		mvc.perform(get("/api/v1/posts/{postId}/full", postId)).andExpectAll(status().isOk(),
+				content().bytes("".getBytes()));
 	}
 
 }
