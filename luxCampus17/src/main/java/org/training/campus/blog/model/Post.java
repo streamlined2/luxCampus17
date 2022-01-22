@@ -20,11 +20,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @AllArgsConstructor @NoArgsConstructor @Builder
 @Getter @Setter
-@ToString @EqualsAndHashCode(of = { "id" })
+@EqualsAndHashCode(of = { "id" })
 @Entity @Table(name = "post", schema = "public")
 public class Post implements Serializable {
 
@@ -37,6 +36,6 @@ public class Post implements Serializable {
 	@Column(name = "star", nullable = false)
 	private boolean star;
 	@OneToMany(mappedBy = "post")
-	private List<Comment> comments = new ArrayList<>();
+	private final List<Comment> comments = new ArrayList<>();
 	
 }

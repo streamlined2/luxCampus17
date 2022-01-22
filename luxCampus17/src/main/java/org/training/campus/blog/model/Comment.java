@@ -18,11 +18,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @AllArgsConstructor @NoArgsConstructor @Builder
 @Setter @Getter
-@ToString @EqualsAndHashCode(of= {"id"})
+@EqualsAndHashCode(of= {"id"})
 @Entity @Table(name = "comment", schema = "public")
 public class Comment implements Serializable {
 	
