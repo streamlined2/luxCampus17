@@ -4,9 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import org.training.campus.blog.model.Comment;
-
-public record PostCommentDTO(long id, String title, String content, boolean star, Comment[] comments) {
+public record PostCommentDTO(long id, String title, String content, boolean star, CommentDTO[] comments) {
 
 	@Override
 	public boolean equals(Object obj) {
@@ -25,9 +23,9 @@ public record PostCommentDTO(long id, String title, String content, boolean star
 	public String toString() {
 		StringJoiner join = new StringJoiner(",","[","]");
 		join.add(String.valueOf(id)).add(title).add(content).add(String.valueOf(star));
-		for(Comment comment:comments) {
+		for(var comment:comments) {
 			StringJoiner commentJoin = new StringJoiner(",","(",")");
-			commentJoin.add(String.valueOf(id)).add(comment.getText()).add(DateTimeFormatter.ISO_DATE.format(comment.getCreationDate()));
+			commentJoin.add(String.valueOf(id)).add(comment.text()).add(DateTimeFormatter.ISO_DATE.format(comment.creationDate()));
 			join.add(commentJoin.toString());			
 		}
 		return join.toString();

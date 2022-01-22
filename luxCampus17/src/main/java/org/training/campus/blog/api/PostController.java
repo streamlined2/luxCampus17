@@ -75,7 +75,7 @@ public class PostController {
 	
 	@GetMapping("/{postId}/full")
 	public PostCommentDTO postCommentFullListing(@PathVariable("postId") Long postId) {
-		return null;
+		return postService.getPostComments(postId).orElse(null);
 	}
 
 }

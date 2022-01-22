@@ -42,16 +42,17 @@ import org.training.campus.blog.service.PostService;
 
 class LuxCampus17ApplicationTests {
 
-	@Mock
-	private PostService postService;
 	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private PostMapper postMapper;
-	@Mock
-	private CommentService commentService;
 	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private CommentMapper commentMapper;
-	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	@InjectMocks
 	private PostCommentMapper postCommentMapper;
+
+	@Mock
+	private PostService postService;
+	@Mock
+	private CommentService commentService;
 
 	@InjectMocks
 	private PostController postController;
