@@ -1,7 +1,6 @@
 package org.training.campus.blog.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -36,6 +35,6 @@ public class Post implements Serializable {
 	@Column(name = "star", nullable = false)
 	private boolean star;
 	@OneToMany(mappedBy = "post")
-	private final List<Comment> comments = new ArrayList<>();
+	private List<Comment> comments;
 	
 }

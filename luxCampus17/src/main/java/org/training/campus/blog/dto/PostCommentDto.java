@@ -4,11 +4,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public record PostCommentDTO(long id, String title, String content, boolean star, CommentDto[] comments) {
+public record PostCommentDto(long id, String title, String content, boolean star, CommentDto[] comments) {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof PostCommentDTO dto) {
+		if(obj instanceof PostCommentDto dto) {
 			return id==dto.id;
 		}
 		return false;

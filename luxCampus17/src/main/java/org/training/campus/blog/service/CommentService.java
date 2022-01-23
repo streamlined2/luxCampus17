@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.training.campus.blog.dao.CommentDao;
 import org.training.campus.blog.dao.PostDao;
 import org.training.campus.blog.dto.CommentDto;
@@ -15,6 +18,7 @@ import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
 
 @Service
+@Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 public class CommentService {
 
 	private final PostDao postDao;
@@ -22,7 +26,7 @@ public class CommentService {
 	private final CommentMapper commentMapper;
 
 	@Autowired
-	private CommentService(PostDao postDao, CommentDao commentDao, CommentMapper commentMapper) {
+	CommentService(PostDao postDao, CommentDao commentDao, CommentMapper commentMapper) {
 		this.postDao = postDao;
 		this.commentDao = commentDao;
 		this.commentMapper = commentMapper;
@@ -41,6 +45,7 @@ public class CommentService {
 				.map(commentMapper::toDto);
 	}
 
+	@Transactional(readOnly = false)
 	public Optional<CommentDto> add(Long postId, CommentDto commentDto) {
 		Optional<Post> postData = postDao.findById(postId);
 		if (postData.isPresent()) {
@@ -52,6 +57,7 @@ public class CommentService {
 		return Optional.empty();
 	}
 
+	@Transactional(readOnly = false)
 	public Optional<CommentDto> save(Long commentId, CommentDto commentDto) {
 		Optional<Comment> commentData = commentDao.findById(commentId);
 		if (commentData.isPresent()) {

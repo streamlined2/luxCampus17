@@ -18,7 +18,7 @@ public class PostCommentMapper {
 		this.commentMapper = commentMapper;
 	}
 	
-	public PostCommentDTO toDto(Post post, Comment[] comments) {
+	public PostCommentDto toDto(Post post, Comment[] comments) {
 		List<CommentDto> commentDTOs = new ArrayList<>();
 		for(var comment:comments) {
 			commentDTOs.add(commentMapper.toDto(comment));
@@ -26,11 +26,11 @@ public class PostCommentMapper {
 		return toDto(post, commentDTOs.toArray(new CommentDto[0]));
 	}
 	
-	public PostCommentDTO toDto(Post post, CommentDto[] comments) {
-		return new PostCommentDTO(post.getId(), post.getTitle(), post.getContent(), post.isStar(), comments);
+	public PostCommentDto toDto(Post post, CommentDto[] comments) {
+		return new PostCommentDto(post.getId(), post.getTitle(), post.getContent(), post.isStar(), comments);
 	}
 	
-	public Post toPost(PostCommentDTO dto) {
+	public Post toPost(PostCommentDto dto) {
 		return Post.builder().id(dto.id()).title(dto.title()).content(dto.content()).star(dto.star()).build();
 	}
 	

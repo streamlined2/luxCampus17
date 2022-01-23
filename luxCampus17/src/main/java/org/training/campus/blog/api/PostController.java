@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.training.campus.blog.dto.PostCommentDTO;
+import org.training.campus.blog.dto.PostCommentDto;
 import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.service.PostService;
 
@@ -70,7 +70,7 @@ public class PostController {
 	}
 	
 	@GetMapping("/{postId}/full")
-	public PostCommentDTO postCommentFullListing(@PathVariable("postId") Long postId) {
+	public PostCommentDto postCommentFullListing(@PathVariable("postId") Long postId) {
 		return postService.getPostComments(postId).orElse(null);
 	}
 

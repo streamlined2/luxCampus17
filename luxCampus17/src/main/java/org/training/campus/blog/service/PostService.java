@@ -9,17 +9,20 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.training.campus.blog.dao.PostDao;
 import org.training.campus.blog.dto.CommentDto;
-import org.training.campus.blog.dto.PostCommentDTO;
+import org.training.campus.blog.dto.PostCommentDto;
 import org.training.campus.blog.dto.PostCommentMapper;
 import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.dto.PostMapper;
-import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
 import org.training.campus.blog.model.Post.PostBuilder;
 
 @Service
+@Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 public class PostService {
 
 	private final PostDao dao;
@@ -28,7 +31,7 @@ public class PostService {
 	private final CommentService commentService;
 
 	@Autowired
-	private PostService(PostDao dao, PostMapper postMapper, PostCommentMapper postCommentMapper,
+	PostService(PostDao dao, PostMapper postMapper, PostCommentMapper postCommentMapper,
 			CommentService commentService) {
 		this.dao = dao;
 		this.postMapper = postMapper;
@@ -50,10 +53,12 @@ public class PostService {
 		return postList.stream().map(postMapper::toDto).toList();
 	}
 
+	@Transactional(readOnly = false)
 	public PostDto save(PostDto postDto) {
 		return postMapper.toDto(dao.save(postMapper.toPost(postDto)));
 	}
 
+	@Transactional(readOnly = false)
 	public PostDto save(Long id, PostDto postDto) {
 		Post post = postMapper.toPost(postDto);
 		post.setId(id);
@@ -64,6 +69,7 @@ public class PostService {
 		return dao.findById(id).map(postMapper::toDto);
 	}
 
+	@Transactional(readOnly = false)
 	public void deleteById(Long id) {
 		dao.deleteById(id);
 	}
@@ -76,6 +82,7 @@ public class PostService {
 		return postList.stream().map(postMapper::toDto).toList();
 	}
 
+	@Transactional(readOnly = false)
 	public boolean placeMark(Long id, boolean value) {
 		Optional<Post> postData = dao.findById(id);
 		if (postData.isPresent()) {
@@ -87,7 +94,7 @@ public class PostService {
 		return false;
 	}
 
-	public Optional<PostCommentDTO> getPostComments(Long postId) {
+	public Optional<PostCommentDto> getPostComments(Long postId) {
 		Optional<Post> postData = dao.findById(postId);
 		if (postData.isPresent()) {
 			Post post = postData.get();
