@@ -32,8 +32,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.training.campus.blog.api.CommentController;
 import org.training.campus.blog.api.PostController;
+import org.training.campus.blog.dto.CommentDto;
 import org.training.campus.blog.dto.CommentMapper;
 import org.training.campus.blog.dto.PostCommentMapper;
+import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.dto.PostMapper;
 import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
@@ -65,9 +67,9 @@ class LuxCampus17ApplicationTests {
 	@Captor
 	private ArgumentCaptor<Long> idCaptor;
 	@Captor
-	private ArgumentCaptor<Post> postCaptor;
+	private ArgumentCaptor<PostDto> postCaptor;
 	@Captor
-	private ArgumentCaptor<Comment> commentCaptor;
+	private ArgumentCaptor<CommentDto> commentCaptor;
 
 	@BeforeEach
 	private void init() {
@@ -83,11 +85,11 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for all posts listing")
 	void testListOfAllPosts() throws Exception {
-		final List<Post> sampleData = List.of(
-				Post.builder().id(1L).title("Most talented person I've ever met")
-						.content("I've met her today while walking in the street.").build(),
-				Post.builder().id(2L).title("Most valuable dish I've ever served")
-						.content("Cold salmon topped with fried onions and soaked with white wine").build());
+		final List<PostDto> sampleData = List.of(
+				new PostDto(1L, "Most talented person I've ever met", "I've met her today while walking in the street.",
+						false),
+				new PostDto(2L, "Most valuable dish I've ever served",
+						"Cold salmon topped with fried onions and soaked with white wine", false));
 
 		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
@@ -113,8 +115,8 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for all posts with given title")
 	void testListOfPostsWithGivenTitle() throws Exception {
-		final List<Post> sampleData = List.of(Post.builder().id(1L).title("Most talented person I've ever met")
-				.content("I've met her today while walking in the street.").build());
+		final List<PostDto> sampleData = List.of(new PostDto(1L, "Most talented person I've ever met",
+				"I've met her today while walking in the street.", false));
 
 		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
@@ -135,11 +137,11 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for all posts sorted by title")
 	void testListOfPostsSortedByTitle() throws Exception {
-		final List<Post> sampleData = List.of(
-				Post.builder().id(1L).title("Most valuable dish I've ever served")
-						.content("Cold salmon topped with fried onions and soaked with white wine").build(),
-				Post.builder().id(2L).title("Most talented person I've ever met")
-						.content("I've met her today while walking in the street.").build());
+		final List<PostDto> sampleData = List.of(
+				new PostDto(1L, "Most valuable dish I've ever served",
+						"Cold salmon topped with fried onions and soaked with white wine", false),
+				new PostDto(2L, "Most talented person I've ever met", "I've met her today while walking in the street.",
+						false));
 
 		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
@@ -166,8 +168,8 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for one post listing that's found successfully")
 	void testListOfOnePostSuccess() throws Exception {
 		final Long id = 1L;
-		final Post samplePost = Post.builder().id(id).title("Most talented person I've ever met")
-				.content("I've met her today while walking in the street.").build();
+		final PostDto samplePost = new PostDto(id, "Most talented person I've ever met",
+				"I've met her today while walking in the street.", false);
 
 		when(postService.findById(id)).thenReturn(Optional.of(samplePost));
 
@@ -196,12 +198,9 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for post addition")
 	void testAddPost() throws Exception {
 		final Long id = 1L;
-
-		doAnswer(invocation -> {
-			Post p = (Post) invocation.getArgument(0);
-			p.setId(id);
-			return p;
-		}).when(postService).save(any(Post.class));
+		final PostDto postDto = new PostDto(id, "Top-ranking story",
+				"This is most amazing story I've ever read in my life!", false);
+		when(postService.save(any(PostDto.class))).thenReturn(postDto);
 
 		mvc.perform(post("/api/v1/posts").contentType(MediaType.APPLICATION_JSON).content("""
 				   {
@@ -213,22 +212,18 @@ class LuxCampus17ApplicationTests {
 				content().string(String.valueOf(id)));
 
 		verify(postService).save(postCaptor.capture());
-		assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
-		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().getContent());
-		assertEquals(id, postCaptor.getValue().getId());
+		assertEquals("Top-ranking story", postCaptor.getValue().title());
+		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().content());
+		assertEquals(false, postCaptor.getValue().star());
 	}
 
 	@Test
 	@DisplayName("test for post modification")
 	void testModifyPost() throws Exception {
 		final Long id = 1L;
-
-		doAnswer(invocation -> {
-			Long postId = (Long) invocation.getArgument(0);
-			Post p = (Post) invocation.getArgument(1);
-			p.setId(postId);
-			return p;
-		}).when(postService).save(any(Long.class), any(Post.class));
+		final PostDto postDto = new PostDto(id, "Top-ranking story",
+				"This is most amazing story I've ever read in my life!", false);
+		when(postService.save(any(Long.class), any(PostDto.class))).thenReturn(postDto);
 
 		mvc.perform(put("/api/v1/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
 				   {
@@ -239,10 +234,10 @@ class LuxCampus17ApplicationTests {
 				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
 		verify(postService).save(idCaptor.capture(), postCaptor.capture());
-		assertEquals("Top-ranking story", postCaptor.getValue().getTitle());
-		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().getContent());
 		assertEquals(id, idCaptor.getValue());
-		assertEquals(id, postCaptor.getValue().getId());
+		assertEquals("Top-ranking story", postCaptor.getValue().title());
+		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().content());
+		assertEquals(false, postCaptor.getValue().star());
 	}
 
 	@Test
@@ -260,8 +255,8 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for starred posts listing")
 	void testGetAllTops() throws Exception {
-		final List<Post> sampleData = List.of(Post.builder().id(1L).title("Most talented person I've ever met")
-				.content("I've met her today while walking in the street.").star(true).build());
+		final List<PostDto> sampleData = List.of(new PostDto(1L, "Most talented person I've ever met",
+				"I've met her today while walking in the street.", true));
 
 		when(postService.findAllStarred()).thenReturn(sampleData);
 
@@ -309,15 +304,15 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test all comments listing for given post")
 	void testListOfCommentsForGivenPost() throws Exception {
-		final Post samplePost = Post.builder().id(1L).title("Most talented person I've ever met")
-				.content("I've met her today while walking in the street.").build();
-		final List<Comment> comments = List.of(new Comment(1L, "Comment#1", LocalDate.of(2020, 10, 01), samplePost),
-				new Comment(2L, "Comment#2", LocalDate.of(2021, 01, 02), samplePost),
-				new Comment(3L, "Comment#3", LocalDate.of(2021, 03, 05), samplePost));
+		final PostDto samplePost = new PostDto(1L, "Most talented person I've ever met",
+				"I've met her today while walking in the street.", false);
+		final List<CommentDto> comments = List.of(new CommentDto(1L, "Comment#1", LocalDate.of(2020, 10, 01)),
+				new CommentDto(2L, "Comment#2", LocalDate.of(2021, 01, 02)),
+				new CommentDto(3L, "Comment#3", LocalDate.of(2021, 03, 05)));
 
-		when(commentService.getCommentsForPost(samplePost.getId())).thenReturn(comments);
+		when(commentService.getCommentsForPost(samplePost.id())).thenReturn(comments);
 
-		mvc.perform(get("/api/v1/posts/{postId}/comments", samplePost.getId())).andExpectAll(status().isOk(),
+		mvc.perform(get("/api/v1/posts/{postId}/comments", samplePost.id())).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
 						[
 						   {
@@ -342,14 +337,13 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test comment listing with given post and comment ids")
 	void testCommentForGivenPostCommentIds() throws Exception {
-		final Post samplePost = Post.builder().id(1L).title("Most talented person I've ever met")
-				.content("I've met her today while walking in the street.").build();
-		final Optional<Comment> comment = Optional
-				.of(new Comment(1L, "Comment#1", LocalDate.of(2020, 10, 01), samplePost));
+		final PostDto samplePost = new PostDto(1L, "Most talented person I've ever met",
+				"I've met her today while walking in the street.", false);
+		final Optional<CommentDto> comment = Optional.of(new CommentDto(1L, "Comment#1", LocalDate.of(2020, 10, 01)));
 
-		when(commentService.getCommentForPost(samplePost.getId(), comment.get().getId())).thenReturn(comment);
+		when(commentService.getCommentForPost(samplePost.id(), comment.get().id())).thenReturn(comment);
 
-		mvc.perform(get("/api/v1/posts/{postId}/comments/{commentId}", samplePost.getId(), comment.get().getId()))
+		mvc.perform(get("/api/v1/posts/{postId}/comments/{commentId}", samplePost.id(), comment.get().id()))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON), content().json("""
 						   {
 						       "id": 1,
@@ -363,19 +357,10 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for comment addition")
 	void testAddComment() throws Exception {
 		final Long postId = 1L;
-		final Post post = Post.builder().id(postId).title("Happy life").content("Doing right things in right time")
-				.build();
 		final Long commentId = 10L;
 		final LocalDate creationDate = LocalDate.of(2020, 01, 01);
-		final Comment comment = new Comment(0L, "Dummy text", null, null);
-
-		doAnswer(invocation -> {
-			Comment c = (Comment) invocation.getArgument(1);
-			c.setId(commentId);
-			c.setCreationDate(creationDate);
-			c.setPost(post);
-			return Optional.of(c);
-		}).when(commentService).add(anyLong(), eq(comment));
+		final CommentDto commentDto = new CommentDto(commentId, "Never-ending story about happy life...", creationDate);
+		when(commentService.add(anyLong(), any(CommentDto.class))).thenReturn(Optional.of(commentDto));
 
 		mvc.perform(post("/api/v1/posts/{postId}/comments", postId).contentType(MediaType.APPLICATION_JSON).content("""
 				   {
@@ -385,11 +370,9 @@ class LuxCampus17ApplicationTests {
 				content().string(String.valueOf(commentId)));
 
 		verify(commentService).add(anyLong(), commentCaptor.capture());
-		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().getText());
-		assertEquals(creationDate, commentCaptor.getValue().getCreationDate());
-		assertEquals(commentId, commentCaptor.getValue().getId());
-		assertEquals(postId, commentCaptor.getValue().getPost().getId());
-
+		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().text());
+		assertEquals(creationDate, commentDto.creationDate());
+		assertEquals(commentId, commentDto.id());
 	}
 
 	@Test
@@ -400,13 +383,8 @@ class LuxCampus17ApplicationTests {
 		final Long commentId = 10L;
 		final LocalDate creationDate = LocalDate.of(2020, 01, 01);
 
-		doAnswer(invocation -> {
-			Comment c = (Comment) invocation.getArgument(1);
-			c.setId(commentId);
-			c.setCreationDate(creationDate);
-			c.setPost(post);
-			return Optional.of(c);
-		}).when(commentService).save(anyLong(), any(Comment.class));
+		final CommentDto commentDto = new CommentDto(commentId, "Never-ending story about happy life...", creationDate);
+		when(commentService.save(anyLong(), any(CommentDto.class))).thenReturn(Optional.of(commentDto));
 
 		mvc.perform(put("/api/v1/posts/{postId}/comments/{commentId}", postId, commentId)
 				.contentType(MediaType.APPLICATION_JSON).content("""
@@ -417,10 +395,7 @@ class LuxCampus17ApplicationTests {
 				.andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
 		verify(commentService).save(anyLong(), commentCaptor.capture());
-		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().getText());
-		assertEquals(creationDate, commentCaptor.getValue().getCreationDate());
-		assertEquals(commentId, commentCaptor.getValue().getId());
-		assertEquals(postId, commentCaptor.getValue().getPost().getId());
+		assertEquals("Never-ending story about happy life...", commentCaptor.getValue().text());
 
 	}
 

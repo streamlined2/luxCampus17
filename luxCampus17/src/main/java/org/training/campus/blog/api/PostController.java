@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.training.campus.blog.dto.PostCommentDTO;
-import org.training.campus.blog.dto.PostDTO;
-import org.training.campus.blog.dto.PostMapper;
+import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.service.PostService;
 
 @RestController
@@ -23,34 +22,31 @@ import org.training.campus.blog.service.PostService;
 public class PostController {
 
 	private final PostService postService;
-	private final PostMapper postMapper;
 
 	@Autowired
-	private PostController(PostService postService, PostMapper postMapper) {
+	private PostController(PostService postService) {
 		this.postService = postService;
-		this.postMapper = postMapper;
 	}
 
 	@GetMapping
-	public List<PostDTO> getAll(@RequestParam(name = "title", required = false) String title,
+	public List<PostDto> getAll(@RequestParam(name = "title", required = false) String title,
 			@RequestParam(name = "sort", required = false) String sort) {
-		return postService.findAll(Optional.ofNullable(title), Optional.ofNullable(sort)).stream()
-				.map(postMapper::toDto).toList();
+		return postService.findAll(Optional.ofNullable(title), Optional.ofNullable(sort));
 	}
 
 	@GetMapping("/{id}")
-	public PostDTO getById(@PathVariable("id") Long id) {
-		return postService.findById(id).map(postMapper::toDto).orElse(null);
+	public PostDto getById(@PathVariable("id") Long id) {
+		return postService.findById(id).orElse(null);
 	}
 
 	@PostMapping
-	public Long add(@RequestBody PostDTO postDto) {
-		return postService.save(postMapper.toPost(postDto)).getId();
+	public Long add(@RequestBody PostDto postDto) {
+		return postService.save(postDto).id();
 	}
 
 	@PutMapping("/{id}")
-	public void modify(@PathVariable("id") Long id, @RequestBody PostDTO postDto) {
-		postService.save(id, postMapper.toPost(postDto));
+	public void modify(@PathVariable("id") Long id, @RequestBody PostDto postDto) {
+		postService.save(id, postDto);
 	}
 
 	@DeleteMapping("/{id}")
@@ -59,8 +55,8 @@ public class PostController {
 	}
 
 	@GetMapping("/star")
-	public List<PostDTO> getAllStarred() {
-		return postService.findAllStarred().stream().map(postMapper::toDto).toList();
+	public List<PostDto> getAllStarred() {
+		return postService.findAllStarred();
 	}
 
 	@PutMapping("/{id}/star")
