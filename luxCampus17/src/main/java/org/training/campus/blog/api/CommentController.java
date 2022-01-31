@@ -1,7 +1,6 @@
 package org.training.campus.blog.api;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,17 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.training.campus.blog.dto.CommentDto;
 import org.training.campus.blog.service.CommentService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/posts")
 public class CommentController {
 
 	private final CommentService commentService;
-
-	@Autowired
-	private CommentController(CommentService commentService) {
-		this.commentService = commentService;
-	}
 
 	@GetMapping("/{postId}/comments")
 	public List<CommentDto> getCommentsForPost(@PathVariable("postId") Long postId) {

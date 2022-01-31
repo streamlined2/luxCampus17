@@ -3,7 +3,6 @@ package org.training.campus.blog.api;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,16 +16,14 @@ import org.training.campus.blog.dto.PostCommentDto;
 import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.service.PostService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/posts")
 public class PostController {
 
 	private final PostService postService;
-
-	@Autowired
-	private PostController(PostService postService) {
-		this.postService = postService;
-	}
 
 	@GetMapping
 	public List<PostDto> getAll(@RequestParam(name = "title", required = false) String title,

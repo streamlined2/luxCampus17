@@ -39,8 +39,8 @@ import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.dto.PostMapper;
 import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
-import org.training.campus.blog.service.CommentService;
-import org.training.campus.blog.service.PostService;
+import org.training.campus.blog.service.DefaultCommentService;
+import org.training.campus.blog.service.DefaultPostService;
 
 class LuxCampus17ApplicationTests {
 
@@ -52,9 +52,9 @@ class LuxCampus17ApplicationTests {
 	private PostCommentMapper postCommentMapper;
 
 	@Mock
-	private PostService postService;
+	private DefaultPostService postService;
 	@Mock
-	private CommentService commentService;
+	private DefaultCommentService commentService;
 
 	@InjectMocks
 	private PostController postController;

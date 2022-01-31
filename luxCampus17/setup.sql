@@ -1,10 +1,10 @@
--- Table: public.post
+-- Table: blog.post
 
--- DROP TABLE public.post;
+-- DROP TABLE blog.post;
 
-CREATE TABLE IF NOT EXISTS public.post
+CREATE TABLE IF NOT EXISTS blog.post
 (
-    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
+    id bigint NOT NULL,
     title character varying(100) COLLATE pg_catalog."default" NOT NULL,
     content character varying(10000) COLLATE pg_catalog."default" NOT NULL,
     star boolean NOT NULL,
@@ -12,19 +12,64 @@ CREATE TABLE IF NOT EXISTS public.post
     CONSTRAINT title UNIQUE (title)
 )
 
--- Table: public.comment
+-- SEQUENCE: blog.post_generator
 
--- DROP TABLE public.comment;
+-- DROP SEQUENCE blog.post_generator;
 
-CREATE TABLE IF NOT EXISTS public.comment
+CREATE SEQUENCE blog.post_generator
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+-- Table: blog.comment
+
+-- DROP TABLE blog.comment;
+
+CREATE TABLE IF NOT EXISTS blog.comment
 (
-    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
+    id bigint NOT NULL,
     text character varying(10000) COLLATE pg_catalog."default" NOT NULL,
     creation_date date NOT NULL,
     post_id bigint NOT NULL,
     CONSTRAINT comment_pkey PRIMARY KEY (id),
     CONSTRAINT post_id FOREIGN KEY (post_id)
-        REFERENCES public.post (id) MATCH SIMPLE
+        REFERENCES blog.post (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
+
+-- SEQUENCE: blog.comment_generator
+
+-- DROP SEQUENCE blog.comment_generator;
+
+CREATE SEQUENCE blog.comment_generator
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+-- Table: blog.tag
+
+-- DROP TABLE blog.tag;
+
+CREATE TABLE IF NOT EXISTS blog.tag
+(
+    id bigint NOT NULL,
+    name character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT id PRIMARY KEY (id),
+    CONSTRAINT name UNIQUE (name)
+)
+
+-- SEQUENCE: blog.tag_generator
+
+-- DROP SEQUENCE blog.tag_generator;
+
+CREATE SEQUENCE blog.tag_generator
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
