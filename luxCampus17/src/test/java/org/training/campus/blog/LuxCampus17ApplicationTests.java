@@ -1,7 +1,6 @@
 package org.training.campus.blog;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.eq;
@@ -32,15 +31,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.training.campus.blog.api.CommentController;
 import org.training.campus.blog.api.PostController;
+import org.training.campus.blog.api.TagController;
 import org.training.campus.blog.dto.CommentDto;
 import org.training.campus.blog.dto.CommentMapper;
 import org.training.campus.blog.dto.PostCommentMapper;
 import org.training.campus.blog.dto.PostDto;
 import org.training.campus.blog.dto.PostMapper;
+import org.training.campus.blog.dto.TagDto;
+import org.training.campus.blog.dto.TagMapper;
 import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
+import org.training.campus.blog.service.CommentService;
 import org.training.campus.blog.service.DefaultCommentService;
 import org.training.campus.blog.service.DefaultPostService;
+import org.training.campus.blog.service.PostService;
+import org.training.campus.blog.service.TagService;
 
 class LuxCampus17ApplicationTests {
 
@@ -48,18 +53,24 @@ class LuxCampus17ApplicationTests {
 	private PostMapper postMapper;
 	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private CommentMapper commentMapper;
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	private TagMapper tagMapper;
 	@InjectMocks
 	private PostCommentMapper postCommentMapper;
 
 	@Mock
-	private DefaultPostService postService;
+	private PostService postService;
 	@Mock
-	private DefaultCommentService commentService;
+	private CommentService commentService;
+	@Mock
+	private TagService tagService;
 
 	@InjectMocks
 	private PostController postController;
 	@InjectMocks
 	private CommentController commentController;
+	@InjectMocks
+	private TagController tagController;
 
 	private MockMvc mvc;
 	private AutoCloseable mocksClosableResource;
@@ -70,11 +81,13 @@ class LuxCampus17ApplicationTests {
 	private ArgumentCaptor<PostDto> postCaptor;
 	@Captor
 	private ArgumentCaptor<CommentDto> commentCaptor;
+	@Captor
+	private ArgumentCaptor<TagDto> tagCaptor;
 
 	@BeforeEach
 	private void init() {
 		mocksClosableResource = MockitoAnnotations.openMocks(this);
-		mvc = MockMvcBuilders.standaloneSetup(postController, commentController).build();
+		mvc = MockMvcBuilders.standaloneSetup(postController, commentController, tagController).build();
 	}
 
 	@AfterEach
@@ -450,6 +463,62 @@ class LuxCampus17ApplicationTests {
 
 		mvc.perform(get("/api/v1/posts/{postId}/full", postId)).andExpectAll(status().isOk(),
 				content().bytes("".getBytes()));
+	}
+
+	@Test
+	@DisplayName("test for all tags listing")
+	void testListOfAllTags() throws Exception {
+		final List<TagDto> sampleData = List.of(
+				new TagDto(1L, "java"),
+				new TagDto(2L, "spring"),
+				new TagDto(3L, "interview"));
+
+		when(tagService.findAll()).thenReturn(sampleData);
+
+		mvc.perform(get("/api/v1/tags")).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						[
+						    {
+						        "id": 1,
+						        "name": "java"
+						    },
+						    {
+						        "id": 2,
+						        "name": "spring"
+						    },
+						    {
+						        "id": 3,
+						        "name": "interview"
+						    }
+						]
+							"""));
+	}
+
+	@Test
+	@DisplayName("test for one tag found successfully")
+	void testListOfOneTagSuccess() throws Exception {
+		final Long id = 1L;
+		final TagDto sampleTag = new TagDto(id, "java");
+
+		when(tagService.findById(id)).thenReturn(Optional.of(sampleTag));
+
+		mvc.perform(get("/api/v1/tags/{id}", id)).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						   {
+						       "id": 1,
+						       "name": "java"
+						   }
+						"""));
+
+	}
+
+	@Test
+	@DisplayName("test for one tag that's not found")
+	void testListOfOneTagFail() throws Exception {
+		final Long id = 1L;
+		when(tagService.findById(id)).thenReturn(Optional.empty());
+
+		mvc.perform(get("/api/v1/tags/{id}", id)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 	}
 
 }
