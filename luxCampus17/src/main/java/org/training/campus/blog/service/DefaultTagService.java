@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.training.campus.blog.dao.TagDao;
 import org.training.campus.blog.dto.TagDto;
+import org.training.campus.blog.dto.TagMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,18 +18,17 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 public class DefaultTagService implements TagService {
 
-	private final TagDao dao;
+	private final TagDao tagDao;
+	private final TagMapper tagMapper;
 
 	@Override
 	public List<TagDto> findAll() {
-		// TODO Auto-generated method stub
-		return List.of();
+		return tagDao.findAll().stream().map(tagMapper::toDto).toList();
 	}
 
 	@Override
 	public Optional<TagDto> findById(Long id) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
+		return tagDao.findById(id).map(tagMapper::toDto);
 	}
 
 }
