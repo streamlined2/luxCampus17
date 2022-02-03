@@ -73,3 +73,14 @@ CREATE SEQUENCE blog.tag_generator
     MINVALUE 1
     MAXVALUE 9223372036854775807
     CACHE 1;
+
+-- Table: blog.posts_tags
+
+-- DROP TABLE blog.posts_tags;
+
+CREATE TABLE IF NOT EXISTS blog.posts_tags
+(
+    post_id bigint NOT NULL,
+    tag_id bigint NOT NULL,
+    CONSTRAINT "unique" UNIQUE (post_id, tag_id)
+)

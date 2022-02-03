@@ -34,10 +34,13 @@ public class Comment implements Serializable {
 	
 	@Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comment_generator")
 	private long id;
-	@Column(name = "text", nullable = false) @Length(min = 1, max = 10000) @NotBlank
+	
+	@Column(name = "text", nullable = false) @Length(min = 1, max = 10000, message = "length of comment should be within 1..10000") @NotBlank
 	private String text;
+	
 	@Column(name = "creation_date", nullable = false) @PastOrPresent
 	private LocalDate creationDate;
+	
 	@ManyToOne(optional = false) @JoinColumn(nullable = false, name = "post_id")
 	private Post post;
 

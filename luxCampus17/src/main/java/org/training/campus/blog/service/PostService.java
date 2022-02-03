@@ -25,5 +25,9 @@ public interface PostService {
 	boolean placeMark(Long id, boolean value);
 
 	Optional<PostCommentDto> getPostComments(Long postId);
+	
+	boolean markWithTag(Long postId, Long tagId);
+
+	boolean removeTag(Long postId, Long tagId);
 
 }

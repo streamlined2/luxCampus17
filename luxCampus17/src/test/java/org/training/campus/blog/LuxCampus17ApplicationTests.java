@@ -42,8 +42,6 @@ import org.training.campus.blog.dto.TagMapper;
 import org.training.campus.blog.model.Comment;
 import org.training.campus.blog.model.Post;
 import org.training.campus.blog.service.CommentService;
-import org.training.campus.blog.service.DefaultCommentService;
-import org.training.campus.blog.service.DefaultPostService;
 import org.training.campus.blog.service.PostService;
 import org.training.campus.blog.service.TagService;
 
@@ -76,7 +74,9 @@ class LuxCampus17ApplicationTests {
 	private AutoCloseable mocksClosableResource;
 
 	@Captor
-	private ArgumentCaptor<Long> idCaptor;
+	private ArgumentCaptor<Long> postIdCaptor;
+	@Captor
+	private ArgumentCaptor<Long> tagIdCaptor;
 	@Captor
 	private ArgumentCaptor<PostDto> postCaptor;
 	@Captor
@@ -128,12 +128,12 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for all posts with given title")
 	void testListOfPostsWithGivenTitle() throws Exception {
-		final List<PostDto> sampleData = List.of(new PostDto(1L, "Most talented person I've ever met",
-				"I've met her today while walking in the street.", false));
+		final String sampleTitle = "Most talented person I've ever met";
+		final List<PostDto> sampleData = List
+				.of(new PostDto(1L, sampleTitle, "I've met her today while walking in the street.", false));
 
 		when(postService.findAll(any(), any())).thenReturn(sampleData);
 
-		final String sampleTitle = "Most talented person I've ever met";
 		mvc.perform(get("/api/v1/posts?title={sampleTitle}", sampleTitle)).andExpectAll(status().isOk(),
 				content().contentType(MediaType.APPLICATION_JSON), content().json("""
 						[
@@ -246,8 +246,8 @@ class LuxCampus17ApplicationTests {
 				  }
 				""").accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
-		verify(postService).save(idCaptor.capture(), postCaptor.capture());
-		assertEquals(id, idCaptor.getValue());
+		verify(postService).save(postIdCaptor.capture(), postCaptor.capture());
+		assertEquals(id, postIdCaptor.getValue());
 		assertEquals("Top-ranking story", postCaptor.getValue().title());
 		assertEquals("This is most amazing story I've ever read in my life!", postCaptor.getValue().content());
 		assertEquals(false, postCaptor.getValue().star());
@@ -261,8 +261,8 @@ class LuxCampus17ApplicationTests {
 		mvc.perform(delete("/api/v1/posts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("")
 				.accept(MediaType.APPLICATION_JSON)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
 
-		verify(postService).deleteById(idCaptor.capture());
-		assertEquals(id, idCaptor.getValue());
+		verify(postService).deleteById(postIdCaptor.capture());
+		assertEquals(id, postIdCaptor.getValue());
 	}
 
 	@Test
@@ -296,8 +296,8 @@ class LuxCampus17ApplicationTests {
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
-		verify(postService).placeMark(idCaptor.capture(), eq(true));
-		assertEquals(id, idCaptor.getValue());
+		verify(postService).placeMark(postIdCaptor.capture(), eq(true));
+		assertEquals(id, postIdCaptor.getValue());
 	}
 
 	@Test
@@ -310,8 +310,8 @@ class LuxCampus17ApplicationTests {
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
-		verify(postService).placeMark(idCaptor.capture(), eq(false));
-		assertEquals(id, idCaptor.getValue());
+		verify(postService).placeMark(postIdCaptor.capture(), eq(false));
+		assertEquals(id, postIdCaptor.getValue());
 	}
 
 	@Test
@@ -468,9 +468,7 @@ class LuxCampus17ApplicationTests {
 	@Test
 	@DisplayName("test for all tags listing")
 	void testListOfAllTags() throws Exception {
-		final List<TagDto> sampleData = List.of(
-				new TagDto(1L, "java"),
-				new TagDto(2L, "spring"),
+		final List<TagDto> sampleData = List.of(new TagDto(1L, "java"), new TagDto(2L, "spring"),
 				new TagDto(3L, "interview"));
 
 		when(tagService.findAll()).thenReturn(sampleData);
@@ -519,6 +517,40 @@ class LuxCampus17ApplicationTests {
 		when(tagService.findById(id)).thenReturn(Optional.empty());
 
 		mvc.perform(get("/api/v1/tags/{id}", id)).andExpectAll(status().isOk(), content().bytes("".getBytes()));
+	}
+
+	@Test
+	@DisplayName("test for post marked with tag")
+	void testMarkWithTag() throws Exception {
+		final Long postId = 1L;
+		final Long tagId = 2L;
+		when(postService.markWithTag(postId, tagId)).thenReturn(true);
+
+		mvc.perform(put("/api/v1/posts/{postId}/tag/{tagId}", postId, tagId).contentType(MediaType.APPLICATION_JSON)
+				.content("").accept(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
+
+		verify(postService).markWithTag(postIdCaptor.capture(), tagIdCaptor.capture());
+		
+		assertEquals(postId, postIdCaptor.getValue());
+		assertEquals(tagId, tagIdCaptor.getValue());
+	}
+
+	@Test
+	@DisplayName("test for removing tag from post")
+	void testRemoveTag() throws Exception {
+		final Long postId = 1L;
+		final Long tagId = 2L;
+		when(postService.removeTag(postId, tagId)).thenReturn(true);
+
+		mvc.perform(delete("/api/v1/posts/{postId}/tag/{tagId}", postId, tagId).contentType(MediaType.APPLICATION_JSON)
+				.content("").accept(MediaType.APPLICATION_JSON))
+				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
+
+		verify(postService).removeTag(postIdCaptor.capture(), tagIdCaptor.capture());
+		
+		assertEquals(postId, postIdCaptor.getValue());
+		assertEquals(tagId, tagIdCaptor.getValue());
 	}
 
 }

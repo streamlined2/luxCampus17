@@ -50,6 +50,16 @@ public class PostController {
 	public void delete(@PathVariable("id") Long id) {
 		postService.deleteById(id);
 	}
+	
+	@PutMapping("/{postId}/tag/{tagId}")
+	public boolean markWithTag(@PathVariable Long postId, @PathVariable Long tagId) {
+		return postService.markWithTag(postId, tagId);
+	}
+	
+	@DeleteMapping("/{postId}/tag/{tagId}")
+	public boolean removeTag(@PathVariable Long postId, @PathVariable Long tagId) {
+		return postService.removeTag(postId, tagId);
+	}
 
 	@GetMapping("/star")
 	public List<PostDto> getAllStarred() {

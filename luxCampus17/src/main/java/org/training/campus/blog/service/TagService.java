@@ -10,4 +10,10 @@ public interface TagService {
 
 	Optional<TagDto> findById(Long id);
 
+	TagDto save(TagDto tagDto);
+
+	TagDto save(Long id, TagDto tagDto);
+
+	void deleteById(Long id);
+
 }

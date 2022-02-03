@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.training.campus.blog.dao.TagDao;
 import org.training.campus.blog.dto.TagDto;
 import org.training.campus.blog.dto.TagMapper;
+import org.training.campus.blog.model.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +30,26 @@ public class DefaultTagService implements TagService {
 	@Override
 	public Optional<TagDto> findById(Long id) {
 		return tagDao.findById(id).map(tagMapper::toDto);
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public TagDto save(TagDto tagDto) {
+		return tagMapper.toDto(tagDao.save(tagMapper.toTag(tagDto)));
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public TagDto save(Long id, TagDto tagDto) {
+		Tag tag = tagMapper.toTag(tagDto);
+		tag.setId(id);
+		return tagMapper.toDto(tagDao.save(tag));
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void deleteById(Long id) {
+		tagDao.deleteById(id);
 	}
 
 }
