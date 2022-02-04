@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.training.campus.blog.dto.TagDto;
 
 public interface TagService {
-	
+
 	List<TagDto> findAll();
 
 	Optional<TagDto> findById(Long id);

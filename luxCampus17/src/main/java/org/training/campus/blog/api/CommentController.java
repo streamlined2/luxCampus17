@@ -20,24 +20,22 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@GetMapping("/{postId}/comments")
-	public List<CommentDto> getCommentsForPost(@PathVariable("postId") Long postId) {
+	public List<CommentDto> getCommentsForPost(@PathVariable Long postId) {
 		return commentService.getCommentsForPost(postId);
 	}
 
 	@GetMapping("/{postId}/comments/{commentId}")
-	public CommentDto getCommentForPost(@PathVariable("postId") Long postId,
-			@PathVariable("commentId") Long commentId) {
+	public CommentDto getCommentForPost(@PathVariable Long postId, @PathVariable Long commentId) {
 		return commentService.getCommentForPost(postId, commentId).orElse(null);
 	}
 
 	@PostMapping("/{postId}/comments")
-	public Long add(@PathVariable("postId") Long postId, @RequestBody CommentDto commentDto) {
+	public Long add(@PathVariable Long postId, @RequestBody CommentDto commentDto) {
 		return commentService.add(postId, commentDto).map(CommentDto::id).orElse(null);
 	}
 
 	@PutMapping("/{postId}/comments/{commentId}")
-	public void modify(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId,
-			@RequestBody CommentDto commentDto) {
+	public void modify(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody CommentDto commentDto) {
 		commentService.save(commentId, commentDto);
 	}
 

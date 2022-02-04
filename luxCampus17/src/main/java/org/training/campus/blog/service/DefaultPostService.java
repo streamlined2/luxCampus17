@@ -2,6 +2,7 @@ package org.training.campus.blog.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -49,6 +50,11 @@ public class DefaultPostService implements PostService {
 		List<Post> postList = postDao.findAll(Example.of(builder.build(), matcher),
 				sortProperty.map(Sort::by).orElse(Sort.unsorted()));
 		return postList.stream().map(postMapper::toDto).toList();
+	}
+
+	@Override
+	public List<PostDto> findPostsByTags(Set<Long> tagIds) {
+		return postDao.findPostsByTags(tagIds).stream().map(postMapper::toDto).toList();
 	}
 
 	@Override
@@ -113,7 +119,7 @@ public class DefaultPostService implements PostService {
 	@Transactional(readOnly = false)
 	public boolean markWithTag(Long postId, Long tagId) {
 		Optional<Post> postData = postDao.findById(postId);
-		if(postData.isPresent()) {
+		if (postData.isPresent()) {
 			Tag tag = tagDao.getById(tagId);
 			postData.get().getTags().add(tag);
 			return true;
@@ -125,7 +131,7 @@ public class DefaultPostService implements PostService {
 	@Transactional(readOnly = false)
 	public boolean removeTag(Long postId, Long tagId) {
 		Optional<Post> postData = postDao.findById(postId);
-		if(postData.isPresent()) {
+		if (postData.isPresent()) {
 			Tag tag = tagDao.getById(tagId);
 			postData.get().getTags().remove(tag);
 			return true;

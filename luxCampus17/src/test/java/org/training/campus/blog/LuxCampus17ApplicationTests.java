@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -531,7 +533,7 @@ class LuxCampus17ApplicationTests {
 				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
 		verify(postService).markWithTag(postIdCaptor.capture(), tagIdCaptor.capture());
-		
+
 		assertEquals(postId, postIdCaptor.getValue());
 		assertEquals(tagId, tagIdCaptor.getValue());
 	}
@@ -548,9 +550,54 @@ class LuxCampus17ApplicationTests {
 				.andExpectAll(status().isOk(), content().string(Boolean.TRUE.toString()));
 
 		verify(postService).removeTag(postIdCaptor.capture(), tagIdCaptor.capture());
-		
+
 		assertEquals(postId, postIdCaptor.getValue());
 		assertEquals(tagId, tagIdCaptor.getValue());
+	}
+
+	@Captor
+	ArgumentCaptor<Set<Long>> tagsCaptor;
+
+	@Test
+	@DisplayName("test for tagged posts listing")
+	void testGetPostsMarkedByTagsSuccess() throws Exception {
+		final List<PostDto> sampleData = List.of(new PostDto(1L, "Most talented person I've ever met",
+				"I've met her today while walking in the street.", true));
+		final Set<Long> tags = Set.of(1L, 2L, 3L);
+
+		when(postService.findPostsByTags(tags)).thenReturn(sampleData);
+
+		mvc.perform(get("/api/v1/posts/tag?tags=1,2,3")).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().json("""
+						[
+						    {
+						        "id": 1,
+						        "title": "Most talented person I've ever met",
+						        "content": "I've met her today while walking in the street.",
+						        "star": true
+						    }
+						]
+							"""));
+
+		verify(postService).findPostsByTags(tagsCaptor.capture());
+
+		assertEquals(tags, tagsCaptor.getValue());
+	}
+
+	@Test
+	@DisplayName("test for empty tagged posts listing")
+	void testGetPostsMarkedByTagsFail() throws Exception {
+		final List<PostDto> sampleData = List.of();
+		final Set<Long> tags = Set.of(1L, 2L, 3L);
+
+		when(postService.findPostsByTags(tags)).thenReturn(sampleData);
+
+		mvc.perform(get("/api/v1/posts/tag?tags=1,2,3")).andExpectAll(status().isOk(),
+				content().contentType(MediaType.APPLICATION_JSON), content().string("[]"));
+
+		verify(postService).findPostsByTags(tagsCaptor.capture());
+
+		assertEquals(tags, tagsCaptor.getValue());
 	}
 
 }
