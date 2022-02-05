@@ -85,6 +85,8 @@ class LuxCampus17ApplicationTests {
 	private ArgumentCaptor<CommentDto> commentCaptor;
 	@Captor
 	private ArgumentCaptor<TagDto> tagCaptor;
+	@Captor
+	private ArgumentCaptor<Set<Long>> tagsCaptor;
 
 	@BeforeEach
 	private void init() {
@@ -554,9 +556,6 @@ class LuxCampus17ApplicationTests {
 		assertEquals(postId, postIdCaptor.getValue());
 		assertEquals(tagId, tagIdCaptor.getValue());
 	}
-
-	@Captor
-	ArgumentCaptor<Set<Long>> tagsCaptor;
 
 	@Test
 	@DisplayName("test for tagged posts listing")

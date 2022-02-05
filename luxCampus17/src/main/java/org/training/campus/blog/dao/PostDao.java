@@ -13,6 +13,6 @@ import org.training.campus.blog.model.Post;
 public interface PostDao extends JpaRepository<Post, Long> {
 
 	@Query("SELECT DISTINCT p FROM Post p LEFT JOIN p.tags t WHERE t.id IN :tagIds")
-	public List<Post> findPostsByTags(@Param("tagIds") Set<Long> tagIds);
+	List<Post> findPostsByTags(@Param("tagIds") Set<Long> tagIds);
 
 }
