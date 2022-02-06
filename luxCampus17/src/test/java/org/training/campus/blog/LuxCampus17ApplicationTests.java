@@ -396,7 +396,6 @@ class LuxCampus17ApplicationTests {
 	@DisplayName("test for comment modification")
 	void testModifyComment() throws Exception {
 		final Long postId = 1L;
-		final Post post = Post.builder().id(postId).build();
 		final Long commentId = 10L;
 		final LocalDate creationDate = LocalDate.of(2020, 01, 01);
 

@@ -58,13 +58,13 @@ public class DefaultPostService implements PostService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public PostDto save(PostDto postDto) {
 		return postMapper.toDto(postDao.save(postMapper.toPost(postDto)));
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public PostDto save(Long id, PostDto postDto) {
 		Post post = postMapper.toPost(postDto);
 		post.setId(id);
@@ -77,7 +77,7 @@ public class DefaultPostService implements PostService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public void deleteById(Long id) {
 		postDao.deleteById(id);
 	}
@@ -92,7 +92,7 @@ public class DefaultPostService implements PostService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public boolean placeMark(Long id, boolean value) {
 		Optional<Post> postData = postDao.findById(id);
 		if (postData.isPresent()) {
@@ -116,7 +116,7 @@ public class DefaultPostService implements PostService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public boolean markWithTag(Long postId, Long tagId) {
 		Optional<Post> postData = postDao.findById(postId);
 		if (postData.isPresent()) {
@@ -128,7 +128,7 @@ public class DefaultPostService implements PostService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public boolean removeTag(Long postId, Long tagId) {
 		Optional<Post> postData = postDao.findById(postId);
 		if (postData.isPresent()) {

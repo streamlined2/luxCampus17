@@ -84,3 +84,28 @@ CREATE TABLE IF NOT EXISTS blog.posts_tags
     tag_id bigint NOT NULL,
     CONSTRAINT "unique" UNIQUE (post_id, tag_id)
 )
+
+-- SEQUENCE: blog.user_generator
+
+-- DROP SEQUENCE blog.user_generator;
+
+CREATE SEQUENCE blog.user_generator
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+-- Table: blog.user
+
+-- DROP TABLE blog."user";
+
+CREATE TABLE IF NOT EXISTS blog."user"
+(
+    id bigint NOT NULL,
+    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    role character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT user_pkey PRIMARY KEY (id),
+    CONSTRAINT unique_name UNIQUE (name)
+)

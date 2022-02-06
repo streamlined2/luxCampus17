@@ -43,7 +43,7 @@ public class DefaultCommentService implements CommentService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public Optional<CommentDto> add(Long postId, CommentDto commentDto) {
 		Optional<Post> postData = postDao.findById(postId);
 		if (postData.isPresent()) {
@@ -56,7 +56,7 @@ public class DefaultCommentService implements CommentService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public Optional<CommentDto> save(Long commentId, CommentDto commentDto) {
 		Optional<Comment> commentData = commentDao.findById(commentId);
 		if (commentData.isPresent()) {

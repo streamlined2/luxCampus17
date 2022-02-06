@@ -33,13 +33,13 @@ public class DefaultTagService implements TagService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public TagDto save(TagDto tagDto) {
 		return tagMapper.toDto(tagDao.save(tagMapper.toTag(tagDto)));
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public TagDto save(Long id, TagDto tagDto) {
 		Tag tag = tagMapper.toTag(tagDto);
 		tag.setId(id);
@@ -47,7 +47,7 @@ public class DefaultTagService implements TagService {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional
 	public void deleteById(Long id) {
 		tagDao.deleteById(id);
 	}
