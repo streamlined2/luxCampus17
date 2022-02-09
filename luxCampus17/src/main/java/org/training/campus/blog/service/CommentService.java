@@ -9,10 +9,12 @@ public interface CommentService {
 
 	List<CommentDto> getCommentsForPost(Long postId);
 
-	Optional<CommentDto> getCommentForPost(Long postId, Long commentId);
+	Optional<CommentDto> getCommentForPost(Long commentId);
 
 	Optional<CommentDto> add(Long postId, CommentDto commentDto);
 
 	Optional<CommentDto> save(Long commentId, CommentDto commentDto);
+	
+	void delete(Long commentId);
 
 }

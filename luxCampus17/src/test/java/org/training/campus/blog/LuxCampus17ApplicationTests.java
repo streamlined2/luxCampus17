@@ -358,7 +358,7 @@ class LuxCampus17ApplicationTests {
 				"I've met her today while walking in the street.", false);
 		final Optional<CommentDto> comment = Optional.of(new CommentDto(1L, "Comment#1", LocalDate.of(2020, 10, 01)));
 
-		when(commentService.getCommentForPost(samplePost.id(), comment.get().id())).thenReturn(comment);
+		when(commentService.getCommentForPost(comment.get().id())).thenReturn(comment);
 
 		mvc.perform(get("/api/v1/posts/{postId}/comments/{commentId}", samplePost.id(), comment.get().id()))
 				.andExpectAll(status().isOk(), content().contentType(MediaType.APPLICATION_JSON), content().json("""

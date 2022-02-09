@@ -1,6 +1,5 @@
 package org.training.campus.blog.security;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +8,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,9 +35,8 @@ public class BasicAuthProvider implements AuthenticationProvider {
 		if (!passwordEncoder.matches(password, userData.get().getEncodedPassword())) {
 			throw new BadCredentialsException(String.format("wrong credentials for user %s", userName));
 		}
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(userData.get().getRole().name()));
-		return new UsernamePasswordAuthenticationToken(userName, password, authorities);
+		return new UsernamePasswordAuthenticationToken(userName, password,
+				List.of(new SimpleGrantedAuthority(userData.get().getRole().name())));
 	}
 
 	@Override

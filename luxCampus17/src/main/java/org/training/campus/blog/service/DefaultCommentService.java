@@ -37,9 +37,8 @@ public class DefaultCommentService implements CommentService {
 	}
 
 	@Override
-	public Optional<CommentDto> getCommentForPost(Long postId, Long commentId) {
-		return getStreamOfCommentsForPost(postId).filter((Comment comment) -> comment.getId() == commentId).findAny()
-				.map(commentMapper::toDto);
+	public Optional<CommentDto> getCommentForPost(Long commentId) {
+		return commentDao.findById(commentId).map(commentMapper::toDto);
 	}
 
 	@Override
@@ -65,6 +64,12 @@ public class DefaultCommentService implements CommentService {
 			return Optional.of(commentMapper.toDto(commentDao.save(comment)));
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	@Transactional
+	public void delete(Long commentId) {
+		commentDao.deleteById(commentId);
 	}
 
 }

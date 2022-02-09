@@ -1,6 +1,8 @@
 package org.training.campus.blog.api;
 
 import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +28,7 @@ public class CommentController {
 
 	@GetMapping("/{postId}/comments/{commentId}")
 	public CommentDto getCommentForPost(@PathVariable Long postId, @PathVariable Long commentId) {
-		return commentService.getCommentForPost(postId, commentId).orElse(null);
+		return commentService.getCommentForPost(commentId).orElse(null);
 	}
 
 	@PostMapping("/{postId}/comments")
@@ -37,6 +39,11 @@ public class CommentController {
 	@PutMapping("/{postId}/comments/{commentId}")
 	public void modify(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody CommentDto commentDto) {
 		commentService.save(commentId, commentDto);
+	}
+
+	@DeleteMapping("/{postId}/comments/{commentId}")
+	public void delete(@PathVariable Long postId, @PathVariable Long commentId) {
+		commentService.delete(commentId);
 	}
 
 }
